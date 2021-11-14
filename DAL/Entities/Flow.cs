@@ -11,7 +11,7 @@ namespace DAL.Entities
         [Column(TypeName = "nvarchar(10)")]
         public string Name { get; set; }
 
-        [Column(TypeName = "nvarchar(5)")]
+        [Column(TypeName = "nvarchar(10)")]
         public string Postfix { get; set; }
 
         public DateTime CreationDate { get; set; }
