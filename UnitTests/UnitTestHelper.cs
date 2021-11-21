@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using AutoMapper;
+using BLL;
 using DAL;
 using DAL.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -88,6 +90,14 @@ namespace UnitTests
             context.Votes.Add(new Vote() { Result = VoteResult.Against, Voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 1"), User = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com") });
             context.Votes.Add(new Vote() { Result = VoteResult.Neutral, Voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 2"), User = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com") });
             context.SaveChanges();
+        }
+
+        public static Mapper CreateMapperProfile()
+        {
+            var myProfile = new AutoMapperProfile();
+            var configuration = new MapperConfiguration(cfg => cfg.AddProfile(myProfile));
+
+            return new Mapper(configuration);
         }
     }
 }
