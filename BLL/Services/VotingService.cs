@@ -19,6 +19,8 @@ namespace BLL.Services
 
         private readonly IMapper _mapper;
 
+        private const short _minDescriptionLength = 400;
+
         public VotingService(ApplicationContext context, IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context), "Context cannot be null");
@@ -27,16 +29,41 @@ namespace BLL.Services
 
         public async Task AddAsync(VotingModel model)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(model.Name))
+                throw new ArgumentNullException(nameof(model), "Model's name cannot be null or empty");
+            if (string.IsNullOrEmpty(model.Description))
+                throw new ArgumentNullException(nameof(model), "Model's description cannot be null or empty");
+            if (model.Description.Length < _minDescriptionLength)
+                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters", 
+                    model.Description);
+            if (model.MinimalForPercentage <= 0)
+                throw new ArgumentException($"Model's minimal for percentage cannot be less than or equal 0", 
+                    nameof(model));
+            model.CreationDate = DateTime.Now;
+            if (model.CompletionDate < model.CreationDate)
+                throw new ArgumentException($"Model's completion date cannot be less than creation date",
+                    nameof(model));
+            if (model.VisibilityTerm <= 0)
+                throw new ArgumentException($"Model's visibility term cannot be less than or equal 0",
+                    nameof(model));
+            if (string.IsNullOrEmpty(model.AuthorId))
+                throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
+            if (await _context.Users.FindAsync(model.AuthorId) is null)
+                throw new ArgumentNullException(nameof(model), "Author with such an id was not found");
+            await _context.Votings.AddAsync(_mapper.Map<Voting>(model));
+            await _context.SaveChangesAsync();
         }
 
         public async Task AddVoteAsync(VoteModel model)
         {
             if (await GetByIdAsync(model.VotingId) is null)
-                throw new ArgumentNullException(nameof(model.VotingId), "Voting with such an id was not found");
+                throw new ArgumentNullException(nameof(model), "Voting with such an id was not found");
             if (await _context.Users.FindAsync(model.UserId) is null)
-                throw new ArgumentNullException(nameof(model.UserId), "User with such an id was not found");
+                throw new ArgumentNullException(nameof(model), "User with such an id was not found");
+            if (await _context.Votes.FindAsync(model.UserId, model.VotingId) != null)
+                throw new ArgumentException("Such a vote already exists", nameof(model));
             await _context.Votes.AddAsync(_mapper.Map<Vote>(model));
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteByIdAsync(int id)
@@ -58,9 +85,30 @@ namespace BLL.Services
             return _mapper.Map<VotingModel>(await _context.Votings.FindAsync(id));
         }
 
-        public Task UpdateAsync(VotingModel model)
+        public async Task UpdateAsync(VotingModel model)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(model.Name))
+                throw new ArgumentNullException(nameof(model), "Model's name cannot be null or empty");
+            if (string.IsNullOrEmpty(model.Description))
+                throw new ArgumentNullException(nameof(model), "Model's description cannot be null or empty");
+            if (model.Description.Length < _minDescriptionLength)
+                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters",
+                    model.Description);
+            if (model.MinimalForPercentage <= 0)
+                throw new ArgumentException($"Model's minimal for percentage cannot be less than or equal 0",
+                    nameof(model));
+            if (model.CompletionDate < model.CreationDate)
+                throw new ArgumentException($"Model's completion date cannot be less than creation date",
+                    nameof(model));
+            if (model.VisibilityTerm <= 0)
+                throw new ArgumentException($"Model's visibility term cannot be less than or equal 0",
+                    nameof(model));
+            if (string.IsNullOrEmpty(model.AuthorId))
+                throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
+            if (await _context.Users.FindAsync(model.AuthorId) is null)
+                throw new ArgumentNullException(nameof(model), "Author with such an id was not found");
+            _context.Votings.Update(_mapper.Map<Voting>(model));
+            await _context.SaveChangesAsync();
         }
     }
 }
