@@ -13,6 +13,6 @@ namespace BLL.Interfaces
 
         Task UpdateAsync(TModel model);
 
-        Task DeleteByIdAsync(int modelId);
+        Task DeleteByIdAsync(int id);
     }
 }

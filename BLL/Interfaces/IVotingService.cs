@@ -9,6 +9,6 @@ namespace BLL.Interfaces
 {
     interface IVotingService : ICRUD<VotingModel>
     {
-
+        Task AddVoteAsync(VoteModel model);
     }
 }

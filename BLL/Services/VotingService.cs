@@ -2,6 +2,8 @@
 using BLL.Interfaces;
 using BLL.Models;
 using DAL;
+using DAL.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,24 +25,37 @@ namespace BLL.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper), "Mapper cannot be null");
         }
 
-        public Task AddAsync(VotingModel model)
+        public async Task AddAsync(VotingModel model)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteByIdAsync(int modelId)
+        public async Task AddVoteAsync(VoteModel model)
         {
-            throw new NotImplementedException();
+            if (await GetByIdAsync(model.VotingId) is null)
+                throw new ArgumentNullException(nameof(model.VotingId), "Voting with such an id was not found");
+            if (await _context.Users.FindAsync(model.UserId) is null)
+                throw new ArgumentNullException(nameof(model.UserId), "User with such an id was not found");
+            await _context.Votes.AddAsync(_mapper.Map<Vote>(model));
+        }
+
+        public async Task DeleteByIdAsync(int id)
+        {
+            var model = await _context.Votings.FindAsync(id);
+            if (model is null)
+                throw new ArgumentNullException(nameof(id), "Voting with such an id was not found");
+            _context.Votings.Remove(model);
+            await _context.SaveChangesAsync();
         }
 
         public IEnumerable<VotingModel> GetAll()
         {
-            throw new NotImplementedException();
+            return _mapper.Map<IEnumerable<VotingModel>>(_context.Votings);
         }
 
-        public Task<VotingModel> GetByIdAsync(int id)
+        public async Task<VotingModel> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return _mapper.Map<VotingModel>(await _context.Votings.FindAsync(id));
         }
 
         public Task UpdateAsync(VotingModel model)
