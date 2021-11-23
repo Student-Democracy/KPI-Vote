@@ -77,12 +77,12 @@ namespace BLL.Services
 
         public IEnumerable<VotingModel> GetAll()
         {
-            return _mapper.Map<IEnumerable<VotingModel>>(_context.Votings);
+            return _mapper.Map<IEnumerable<VotingModel>>(_context.Votings.Include(v => v.Votes));
         }
 
         public async Task<VotingModel> GetByIdAsync(int id)
         {
-            return _mapper.Map<VotingModel>(await _context.Votings.FindAsync(id));
+            return _mapper.Map<VotingModel>(await _context.Votings.Include(v => v.Votes).SingleOrDefaultAsync(v => v.Id == id));
         }
 
         public async Task UpdateAsync(VotingModel model)
@@ -109,6 +109,16 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Author with such an id was not found");
             _context.Votings.Update(_mapper.Map<Voting>(model));
             await _context.SaveChangesAsync();
+        }
+
+        public IEnumerable<VoteModel> GetAllVotes()
+        {
+            return _mapper.Map<IEnumerable<VoteModel>>(_context.Votes);
+        }
+
+        public async Task<VoteModel> GetVoteByIdAsync(int id)
+        {
+            return _mapper.Map<VoteModel>(await _context.Votes.FindAsync(id));
         }
     }
 }
