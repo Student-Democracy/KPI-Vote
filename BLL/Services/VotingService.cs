@@ -101,12 +101,48 @@ namespace BLL.Services
 
         public IEnumerable<VotingModel> GetFilteredAndSortedForUser(string userId)
         {
-            throw new NotImplementedException();
+            var user = _context.Users.Find(userId);
+            if (user is null)
+                throw new ArgumentNullException(nameof(userId), "No such a user");
+            var activeVotings = _context.Votings.
+                Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status != VotingStatus.Denied);
+            var group = _context.Groups.Find(user.GroupId);
+            Flow flow = null;
+            Faculty faculty = null;
+            if (!(group is null))
+                flow = _context.Flows.Find(group.FlowId);
+            if (!(flow is null))
+                faculty = _context.Faculties.Find(flow.FacultyId);
+            var userVotings = activeVotings.
+                Where(v => v.GroupId == null && v.FlowId == null && v.FacultyId == null).
+                OrderByDescending(v => v.CreationDate).
+                AsEnumerable();         // KPI level
+            if (!(faculty is null))
+                userVotings = activeVotings.Where(v => v.GroupId == null && v.FlowId == null && v.FacultyId == faculty.Id).
+                    OrderByDescending(v => v.CreationDate).
+                    Concat(userVotings);                        // Faculty level
+            if (!(flow is null))
+                userVotings = activeVotings.Where(v => v.GroupId == null && v.FlowId == flow.Id).
+                    OrderByDescending(v => v.CreationDate).
+                    Concat(userVotings);                        // Flow level
+            if (!(group is null))
+                userVotings = activeVotings.Where(v => v.GroupId == group.Id).
+                    OrderByDescending(v => v.CreationDate).
+                    Concat(userVotings);                        // Group level
+            return _mapper.Map<IEnumerable<VotingModel>>(userVotings);
         }
 
         public IEnumerable<VotingModel> GetFilteredAndSortedForAdmin()
         {
-            throw new NotImplementedException();
+            var votings = _context.Votings.
+                Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status != VotingStatus.Denied).
+                OrderByDescending(v => v.CreationDate).
+                AsEnumerable();
+            var oldOrBannedVotings = _context.Votings.
+                Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) < DateTime.Now || v.Status == VotingStatus.Denied).
+                OrderByDescending(v => v.CreationDate);
+            votings = votings.Concat(oldOrBannedVotings);
+            return _mapper.Map<IEnumerable<VotingModel>>(votings);
         }
     }
 }
