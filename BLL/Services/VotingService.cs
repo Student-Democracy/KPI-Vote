@@ -155,7 +155,8 @@ namespace BLL.Services
                 .Where(v => v.Votes
                     .Where(vote => vote.UserId == userId)
                     .Any()
-                    );
+                    )
+                .AsEnumerable();
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
         }
     }
