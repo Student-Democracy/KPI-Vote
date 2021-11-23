@@ -144,5 +144,19 @@ namespace BLL.Services
             votings = votings.Concat(oldOrBannedVotings);
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
         }
+
+        public IEnumerable<VotingModel> GetUserVotings(string userId)
+        {
+            var user = _context.Users.Find(userId);
+            if (user is null)
+                throw new ArgumentNullException(nameof(userId), "No such a user");
+            var votings = _context.Votings
+                .Include(v => v.Votes)
+                .Where(v => v.Votes
+                    .Where(vote => vote.UserId == userId)
+                    .Any()
+                    );
+            return _mapper.Map<IEnumerable<VotingModel>>(votings);
+        }
     }
 }

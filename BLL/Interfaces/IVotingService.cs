@@ -12,5 +12,7 @@ namespace BLL.Interfaces
         IEnumerable<VotingModel> GetFilteredAndSortedForUser(string userId);
 
         IEnumerable<VotingModel> GetFilteredAndSortedForAdmin();
+
+        IEnumerable<VotingModel> GetUserVotings(string userId);
     }
 }
