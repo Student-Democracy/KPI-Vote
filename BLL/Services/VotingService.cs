@@ -156,6 +156,7 @@ namespace BLL.Services
                     .Where(vote => vote.UserId == userId)
                     .Any()
                     )
+                .OrderByDescending(v => v.CreationDate)
                 .AsEnumerable();
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
         }
