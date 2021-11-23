@@ -54,18 +54,6 @@ namespace BLL.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddVoteAsync(VoteModel model)
-        {
-            if (await GetByIdAsync(model.VotingId) is null)
-                throw new ArgumentNullException(nameof(model), "Voting with such an id was not found");
-            if (await _context.Users.FindAsync(model.UserId) is null)
-                throw new ArgumentNullException(nameof(model), "User with such an id was not found");
-            if (await _context.Votes.FindAsync(model.UserId, model.VotingId) != null)
-                throw new ArgumentException("Such a vote already exists", nameof(model));
-            await _context.Votes.AddAsync(_mapper.Map<Vote>(model));
-            await _context.SaveChangesAsync();
-        }
-
         public async Task DeleteByIdAsync(int id)
         {
             var model = await _context.Votings.FindAsync(id);
@@ -111,14 +99,14 @@ namespace BLL.Services
             await _context.SaveChangesAsync();
         }
 
-        public IEnumerable<VoteModel> GetAllVotes()
+        public IEnumerable<VotingModel> GetFilteredAndSortedForUser(string userId)
         {
-            return _mapper.Map<IEnumerable<VoteModel>>(_context.Votes);
+            throw new NotImplementedException();
         }
 
-        public async Task<VoteModel> GetVoteByIdAsync(int id)
+        public IEnumerable<VotingModel> GetFilteredAndSortedForAdmin()
         {
-            return _mapper.Map<VoteModel>(await _context.Votes.FindAsync(id));
+            throw new NotImplementedException();
         }
     }
 }
