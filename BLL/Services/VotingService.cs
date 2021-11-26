@@ -145,7 +145,7 @@ namespace BLL.Services
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
         }
 
-        public async Task<IEnumerable<VotingModel>> GetUserVotings(string userId)
+        public async Task<IEnumerable<VotingModel>> GetUserVotingsAsync(string userId)
         {
             var user = await _context.Users.FindAsync(userId);
             if (user is null)
