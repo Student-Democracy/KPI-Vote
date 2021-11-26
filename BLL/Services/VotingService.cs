@@ -99,20 +99,20 @@ namespace BLL.Services
             await _context.SaveChangesAsync();
         }
 
-        public IEnumerable<VotingModel> GetFilteredAndSortedForUser(string userId)
+        public async Task<IEnumerable<VotingModel>> GetFilteredAndSortedForUserAsync(string userId)
         {
-            var user = _context.Users.Find(userId);
+            var user = await _context.Users.FindAsync(userId);
             if (user is null)
                 throw new ArgumentNullException(nameof(userId), "No such a user");
             var activeVotings = _context.Votings.
                 Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status != VotingStatus.Denied);
-            var group = _context.Groups.Find(user.GroupId);
+            var group = await _context.Groups.FindAsync(user.GroupId);
             Flow flow = null;
             Faculty faculty = null;
             if (!(group is null))
-                flow = _context.Flows.Find(group.FlowId);
+                flow = await _context.Flows.FindAsync(group.FlowId);
             if (!(flow is null))
-                faculty = _context.Faculties.Find(flow.FacultyId);
+                faculty = await _context.Faculties.FindAsync(flow.FacultyId);
             var userVotings = activeVotings.
                 Where(v => v.GroupId == null && v.FlowId == null && v.FacultyId == null).
                 OrderByDescending(v => v.CreationDate).
@@ -145,9 +145,9 @@ namespace BLL.Services
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
         }
 
-        public IEnumerable<VotingModel> GetUserVotings(string userId)
+        public async Task<IEnumerable<VotingModel>> GetUserVotings(string userId)
         {
-            var user = _context.Users.Find(userId);
+            var user = await _context.Users.FindAsync(userId);
             if (user is null)
                 throw new ArgumentNullException(nameof(userId), "No such a user");
             var votings = _context.Votings
