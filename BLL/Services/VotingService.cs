@@ -104,8 +104,8 @@ namespace BLL.Services
             var user = await _context.Users.FindAsync(userId);
             if (user is null)
                 throw new ArgumentNullException(nameof(userId), "No such a user");
-            var activeVotings = _context.Votings.
-                Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status != VotingStatus.Denied);
+            var activeVotings = await Task.Run(() => _context.Votings.
+                Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status != VotingStatus.Denied));
             var group = await _context.Groups.FindAsync(user.GroupId);
             Flow flow = null;
             Faculty faculty = null;
@@ -113,35 +113,38 @@ namespace BLL.Services
                 flow = await _context.Flows.FindAsync(group.FlowId);
             if (!(flow is null))
                 faculty = await _context.Faculties.FindAsync(flow.FacultyId);
-            var userVotings = activeVotings.
-                Where(v => v.GroupId == null && v.FlowId == null && v.FacultyId == null).
-                OrderByDescending(v => v.CreationDate).
-                AsEnumerable();         // KPI level
+            var userVotings = await Task.Run(() => activeVotings
+            .Where(v => v.GroupId == null && v.FlowId == null && v.FacultyId == null)
+            .OrderByDescending(v => v.CreationDate)
+            .AsEnumerable());         // KPI level
             if (!(faculty is null))
-                userVotings = activeVotings.Where(v => v.GroupId == null && v.FlowId == null && v.FacultyId == faculty.Id).
-                    OrderByDescending(v => v.CreationDate).
-                    Concat(userVotings);                        // Faculty level
+                userVotings = await Task.Run(() => activeVotings
+                .Where(v => v.GroupId == null && v.FlowId == null && v.FacultyId == faculty.Id)
+                .OrderByDescending(v => v.CreationDate)
+                .Concat(userVotings));                        // Faculty level
             if (!(flow is null))
-                userVotings = activeVotings.Where(v => v.GroupId == null && v.FlowId == flow.Id).
-                    OrderByDescending(v => v.CreationDate).
-                    Concat(userVotings);                        // Flow level
+                userVotings = await Task.Run(() => activeVotings
+                .Where(v => v.GroupId == null && v.FlowId == flow.Id)
+                .OrderByDescending(v => v.CreationDate)
+                .Concat(userVotings));                        // Flow level
             if (!(group is null))
-                userVotings = activeVotings.Where(v => v.GroupId == group.Id).
-                    OrderByDescending(v => v.CreationDate).
-                    Concat(userVotings);                        // Group level
+                userVotings = await Task.Run(() => activeVotings
+                .Where(v => v.GroupId == group.Id)
+                .OrderByDescending(v => v.CreationDate)
+                .Concat(userVotings));                        // Group level
             return _mapper.Map<IEnumerable<VotingModel>>(userVotings);
         }
 
-        public IEnumerable<VotingModel> GetFilteredAndSortedForAdmin()
+        public async Task<IEnumerable<VotingModel>> GetFilteredAndSortedForAdminAsync()
         {
-            var votings = _context.Votings.
+            var votings = await Task.Run(() => _context.Votings.
                 Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status != VotingStatus.Denied).
                 OrderByDescending(v => v.CreationDate).
-                AsEnumerable();
-            var oldOrBannedVotings = _context.Votings.
+                AsEnumerable());
+            var oldOrBannedVotings = await Task.Run(() => _context.Votings.
                 Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) < DateTime.Now || v.Status == VotingStatus.Denied).
-                OrderByDescending(v => v.CreationDate);
-            votings = votings.Concat(oldOrBannedVotings);
+                OrderByDescending(v => v.CreationDate));
+            votings = await Task.Run(() => votings.Concat(oldOrBannedVotings));
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
         }
 
@@ -150,14 +153,14 @@ namespace BLL.Services
             var user = await _context.Users.FindAsync(userId);
             if (user is null)
                 throw new ArgumentNullException(nameof(userId), "No such a user");
-            var votings = _context.Votings
+            var votings = await Task.Run(() => _context.Votings
                 .Include(v => v.Votes)
                 .Where(v => v.Votes
                     .Where(vote => vote.UserId == userId)
                     .Any()
                     )
                 .OrderByDescending(v => v.CreationDate)
-                .AsEnumerable();
+                .AsEnumerable());
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
         }
     }
