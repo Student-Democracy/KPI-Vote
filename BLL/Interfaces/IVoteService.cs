@@ -6,10 +6,10 @@ namespace BLL.Interfaces
 {
     public interface IVoteService
     {
-        Task AddVoteAsync(VoteModel model);
+        Task AddAsync(VoteModel model);
 
-        IEnumerable<VoteModel> GetAllVotes();
+        IEnumerable<VoteModel> GetAll();
 
-        Task<VoteModel> GetVoteByIdAsync(int id);
+        Task<VoteModel> GetByIdAsync(string userId, int votingId);
     }
 }

@@ -22,7 +22,7 @@ namespace BLL.Services
             _context = context ?? throw new ArgumentNullException(nameof(context), "Context cannot be null");
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper), "Mapper cannot be null");
         }
-        public async Task AddVoteAsync(VoteModel model)
+        public async Task AddAsync(VoteModel model)
         {
             if (await _context.Votings.FindAsync(model.VotingId) is null)
                 throw new ArgumentNullException(nameof(model), "Voting with such an id was not found");
@@ -34,14 +34,15 @@ namespace BLL.Services
             await _context.SaveChangesAsync();
         }
 
-        public IEnumerable<VoteModel> GetAllVotes()
+        public IEnumerable<VoteModel> GetAll()
         {
             return _mapper.Map<IEnumerable<VoteModel>>(_context.Votes);
         }
 
-        public async Task<VoteModel> GetVoteByIdAsync(int id)
+        public async Task<VoteModel> GetByIdAsync(string userId, int votingId)
         {
-            return _mapper.Map<VoteModel>(await _context.Votes.FindAsync(id));
+            Vote found = await _context.Votes.FindAsync(votingId, userId);
+            return _mapper.Map<VoteModel>(found);
         }
     }
 }

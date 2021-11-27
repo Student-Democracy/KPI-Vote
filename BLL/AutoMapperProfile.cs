@@ -14,6 +14,7 @@ namespace BLL
                 c => c.MapFrom(voting => voting.Votes.
                 Select(x => new VoteModel() { Result = x.Result, UserId = x.UserId, VotingId = x.VotingId})))
                 .ReverseMap();
+            CreateMap<Vote, VoteModel>().ReverseMap();
             CreateMap<Appeal, AppealModel>().ReverseMap();
         }
     }
