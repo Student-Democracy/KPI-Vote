@@ -99,16 +99,18 @@ namespace BLL.Services
             return _mapper.Map<BlockModel>(await _context.Bans.SingleOrDefaultAsync(p => p.UserId == userId && p.DateTo>=DateTime.Now));
         }
 
-        public IEnumerable<BlockModel> GetSortedByAdminId(string adminId)
+        public async Task<IEnumerable<BlockModel>> GetSortedByAdminIdAsync(string adminId)
         {
-            return _mapper.Map<IEnumerable<BlockModel>>(_context.Bans.Where(v => v.AdminId == adminId)
+            var blocks = await Task.Run(() => _context.Bans.Where(v => v.AdminId == adminId)
                                                                      .OrderByDescending(v => v.DateFrom));
+            return _mapper.Map<IEnumerable<BlockModel>>(blocks);
         }
 
-        public IEnumerable<BlockModel> GetSortedActiveBlocks()
+        public async Task<IEnumerable<BlockModel>> GetSortedActiveBlocksAsync()
         {
-            return _mapper.Map<IEnumerable<BlockModel>>(_context.Bans.Where(v => v.DateTo>=DateTime.Now)
+            var blocks = await Task.Run(() => _context.Bans.Where(v => v.DateTo >= DateTime.Now)
                                                                      .OrderByDescending(v => v.DateFrom));
+            return _mapper.Map<IEnumerable<BlockModel>>(blocks);
         }      
 
     }

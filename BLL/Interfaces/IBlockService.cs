@@ -9,11 +9,11 @@ namespace BLL.Interfaces
 {
     interface IBlockService : ICRUD<BlockModel>
     {
-        IEnumerable<BlockModel> GetSortedActiveBlocks();  //active blocks mean that a ban is still continues
+        Task<IEnumerable<BlockModel>> GetSortedActiveBlocksAsync();  //active blocks mean that a ban is still continues
 
         Task<BlockModel> GetByUserIdAsync(string userId);
 
-        IEnumerable<BlockModel> GetSortedByAdminId(string adminId);    
+        Task<IEnumerable<BlockModel>> GetSortedByAdminIdAsync(string adminId);    
 
     }
 }
