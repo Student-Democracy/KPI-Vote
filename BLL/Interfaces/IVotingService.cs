@@ -9,10 +9,10 @@ namespace BLL.Interfaces
 {
     interface IVotingService : ICRUD<VotingModel>
     {
-        IEnumerable<VotingModel> GetFilteredAndSortedForUser(string userId);
+        Task<IEnumerable<VotingModel>> GetFilteredAndSortedForUserAsync(string userId);
 
-        IEnumerable<VotingModel> GetFilteredAndSortedForAdmin();
+        Task<IEnumerable<VotingModel>> GetFilteredAndSortedForAdminAsync();
 
-        IEnumerable<VotingModel> GetUserVotings(string userId);
+        Task<IEnumerable<VotingModel>> GetUserVotingsAsync(string userId);
     }
 }
