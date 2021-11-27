@@ -16,5 +16,7 @@ namespace BLL.Interfaces
         Task<IEnumerable<VotingModel>> GetUserVotingsAsync(string userId);
 
         Task ChangeStatusAsync(VotingModel model);
+
+        Task<bool> IsVotingSuccessful(VotingModel model);
     }
 }

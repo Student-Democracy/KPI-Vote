@@ -29,11 +29,11 @@ namespace BLL.Models
 
         public string StatusSetterId { get; set; }
 
-        public int FacultyId { get; set; }
+        public int? FacultyId { get; set; }
 
-        public int FlowId { get; set; }
+        public int? FlowId { get; set; }
 
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
 
 
         public ICollection<VoteModel> Votes { get; set; }
