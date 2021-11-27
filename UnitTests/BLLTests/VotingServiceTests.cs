@@ -79,8 +79,9 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
                 CompletionDate = DateTime.Now.AddDays(30),
+                MinimalAttendancePercentage = 10m,
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
@@ -121,7 +122,8 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = 10m,
                 CompletionDate = DateTime.Now.AddDays(30),
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
@@ -143,9 +145,10 @@ namespace UnitTests.BLLTests
             {
                 Name = "Sample one",
                 Description = null,
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
                 CompletionDate = DateTime.Now.AddDays(30),
                 VisibilityTerm = 5,
+                MinimalAttendancePercentage = 10m,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
             var expectedCount = context.Votings.Count() + 1;
@@ -169,8 +172,9 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
                 CompletionDate = DateTime.Now.AddDays(30),
+                MinimalAttendancePercentage = 10m,
                 VisibilityTerm = 5,
                 AuthorId = null
             };
@@ -212,9 +216,10 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
                 CompletionDate = DateTime.Now.AddDays(30),
                 VisibilityTerm = 5,
+                MinimalAttendancePercentage = 10m,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
             var expectedCount = context.Votings.Count() + 1;
@@ -234,9 +239,10 @@ namespace UnitTests.BLLTests
             {
                 Name = "Sample 1",
                 Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
                 CompletionDate = DateTime.Now.AddDays(30),
                 VisibilityTerm = 5,
+                MinimalAttendancePercentage = 10m,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
             var expectedCount = context.Votings.Count() + 1;
@@ -249,6 +255,9 @@ namespace UnitTests.BLLTests
         [Test]
         [TestCase(-1.1)]
         [TestCase(0)]
+        [TestCase(3)]
+        [TestCase(101.1)]
+        [TestCase(49.9)]
         public void AddAsync_InvalidMinForPercantage_ThrowsArgumentException(decimal percentage)
         {
             // Arrange
@@ -263,6 +272,37 @@ namespace UnitTests.BLLTests
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
                 MinimalForPercentage = percentage,
+                MinimalAttendancePercentage = 10m,
+                CompletionDate = DateTime.Now.AddDays(30),
+                VisibilityTerm = 5,
+                AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
+            };
+            var expectedCount = context.Votings.Count() + 1;
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentException>(async () => await service.AddAsync(votingModel),
+                "Method does not throw an ArgumentException if the minimal for percantage is 0 or lower than 0");
+        }
+
+        [Test]
+        [TestCase(-1.1)]
+        [TestCase(0)]
+        [TestCase(101.1)]
+        public void AddAsync_InvalidMinAttendancePercantage_ThrowsArgumentException(decimal percentage)
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var votingModel = new VotingModel()
+            {
+                Name = "Sample 1",
+                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = percentage,
                 CompletionDate = DateTime.Now.AddDays(30),
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
@@ -291,7 +331,8 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = 10m,
                 CompletionDate = DateTime.Now.AddDays(30),
                 VisibilityTerm = term,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
@@ -317,7 +358,8 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = 10m,
                 CompletionDate = DateTime.Now.AddDays(-30),
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
@@ -344,9 +386,10 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
                 CreationDate = new DateTime(2021, 11, 14),
                 CompletionDate = new DateTime(2021, 12, 14),
+                MinimalAttendancePercentage = 10m,
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
@@ -385,8 +428,9 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
                 CompletionDate = new DateTime(2021, 12, 14),
+                MinimalAttendancePercentage = 10m,
                 CreationDate = new DateTime(2021, 11, 14),
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
@@ -408,7 +452,7 @@ namespace UnitTests.BLLTests
                 Id = context.Votings.FirstOrDefault(v => v.Name == "Voting 1").Id,
                 Name = "Sample one",
                 Description = null,
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
                 CompletionDate = new DateTime(2021, 12, 14),
                 CreationDate = new DateTime(2021, 11, 14),
                 VisibilityTerm = 5,
@@ -448,7 +492,8 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = 10m,
                 CompletionDate = new DateTime(2021, 12, 14),
                 CreationDate = new DateTime(2021, 11, 14),
                 VisibilityTerm = 5,
@@ -478,7 +523,8 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = 10m,
                 CreationDate = new DateTime(2021, 11, 14),
                 CompletionDate = new DateTime(2021, 12, 14),
                 VisibilityTerm = 5,
@@ -501,7 +547,8 @@ namespace UnitTests.BLLTests
                 Id = context.Votings.FirstOrDefault(v => v.Name == "Voting 1").Id,
                 Name = "Sample 1",
                 Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = 10m,
                 CompletionDate = new DateTime(2021, 12, 14),
                 VisibilityTerm = 5,
                 CreationDate = new DateTime(2021, 11, 14),
@@ -516,6 +563,10 @@ namespace UnitTests.BLLTests
         [Test]
         [TestCase(-1.1)]
         [TestCase(0)]
+        [TestCase(3)]
+        [TestCase(49.9)]
+        [TestCase(100.1)]
+        [TestCase(126)]
         public void UpdateAsync_InvalidMinForPercantage_ThrowsArgumentException(decimal percentage)
         {
             // Arrange
@@ -531,6 +582,39 @@ namespace UnitTests.BLLTests
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
                 MinimalForPercentage = percentage,
+                MinimalAttendancePercentage = 10m,
+                CreationDate = new DateTime(2021, 11, 14),
+                CompletionDate = new DateTime(2021, 12, 14),
+                VisibilityTerm = 5,
+                AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
+            };
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentException>(async () => await service.UpdateAsync(votingModel),
+                "Method does not throw an ArgumentException if the minimal for percantage is 0 or lower than 0");
+        }
+
+        [Test]
+        [TestCase(-1.1)]
+        [TestCase(0)]
+        [TestCase(100.1)]
+        [TestCase(126)]
+        public void UpdateAsync_InvalidMinForAttendance_ThrowsArgumentException(decimal percentage)
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var votingModel = new VotingModel()
+            {
+                Id = context.Votings.FirstOrDefault(v => v.Name == "Voting 1").Id,
+                Name = "Sample 1",
+                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = percentage,
                 CreationDate = new DateTime(2021, 11, 14),
                 CompletionDate = new DateTime(2021, 12, 14),
                 VisibilityTerm = 5,
@@ -560,7 +644,8 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = 10,
                 CompletionDate = new DateTime(2021, 12, 14),
                 VisibilityTerm = term,
                 CreationDate = new DateTime(2021, 11, 14),
@@ -587,7 +672,8 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = 10m,
                 CompletionDate = new DateTime(2021, 11, 1),
                 VisibilityTerm = 5,
                 CreationDate = new DateTime(2021, 11, 14),
@@ -614,7 +700,8 @@ namespace UnitTests.BLLTests
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
-                MinimalForPercentage = 5.5m,
+                MinimalForPercentage = 55m,
+                MinimalAttendancePercentage = 10m,
                 CreationDate = DateTime.Now,
                 CompletionDate = DateTime.Now.AddDays(5),
                 VisibilityTerm = 5,
@@ -644,8 +731,9 @@ namespace UnitTests.BLLTests
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id,
                 CreationDate = new DateTime(2021, 11, 14),
                 CompletionDate = new DateTime(2021, 12, 15),
+                MinimalAttendancePercentage = 10m,
                 VisibilityTerm = 5,
-                MinimalForPercentage = 5.5M,
+                MinimalForPercentage = 55M,
                 StatusSetterId = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com").Id,
                 Status = VotingStatus.Denied
             };
@@ -693,7 +781,8 @@ namespace UnitTests.BLLTests
                 CreationDate = new DateTime(2021, 11, 14),
                 CompletionDate = new DateTime(2021, 12, 15),
                 VisibilityTerm = 5,
-                MinimalForPercentage = 5.5M,
+                MinimalForPercentage = 55M,
+                MinimalAttendancePercentage = 10m,
                 StatusSetterId = null,
                 Status = VotingStatus.Denied
             };
@@ -722,7 +811,8 @@ namespace UnitTests.BLLTests
                 CreationDate = new DateTime(2021, 11, 14),
                 CompletionDate = new DateTime(2021, 12, 15),
                 VisibilityTerm = 5,
-                MinimalForPercentage = 5.5M,
+                MinimalForPercentage = 55M,
+                MinimalAttendancePercentage = 10m,
                 StatusSetterId = "NOT FOUND",
                 Status = VotingStatus.Denied
             };
@@ -762,6 +852,176 @@ namespace UnitTests.BLLTests
             // Act & Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await service.DeleteByIdAsync(id),
                 "Method does not throw an InvalidOperationException if status setter was not found");
+        }
+
+        private static void AddDataForSpecificTests(ApplicationContext context)
+        {
+            context.Votings.Add(new Voting() { Name = "Voting 5", Author = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2022, 1, 14), CompletionDate = new DateTime(2022, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed });
+            context.SaveChanges();
+            context.Votings.Add(new Voting() { Name = "Voting 6", Author = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2022, 1, 14), CompletionDate = new DateTime(2022, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed, Faculty = context.Faculties.FirstOrDefault(f => f.Name == "ФІОТ") });
+            context.SaveChanges();
+            context.Votings.Add(new Voting() { Name = "Voting 7", Author = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2022, 1, 14), CompletionDate = new DateTime(2022, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed, Flow = context.Flows.FirstOrDefault(f => f.Name == "ІС-0") });
+            context.SaveChanges();
+            context.Votings.Add(new Voting() { Name = "Voting 8", Author = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2022, 1, 14), CompletionDate = new DateTime(2022, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed, Group = context.Groups.FirstOrDefault(g => g.Number == 2 && g.Flow.Name == "ІС-0") });
+            context.SaveChanges();
+            context.Votings.Add(new Voting() { Name = "Voting 9", Author = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2020, 11, 14), CompletionDate = new DateTime(2020, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed });
+            context.SaveChanges();
+            context.Votings.Add(new Voting() { Name = "Voting 10", Author = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2020, 11, 14), CompletionDate = new DateTime(2020, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed, Faculty = context.Faculties.FirstOrDefault(f => f.Name == "ФІОТ") });
+            context.SaveChanges();
+            context.Votings.Add(new Voting() { Name = "Voting 11", Author = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2020, 11, 14), CompletionDate = new DateTime(2020, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed, Flow = context.Flows.FirstOrDefault(f => f.Name == "ІС-0") });
+            context.SaveChanges();
+            context.Votings.Add(new Voting() { Name = "Voting 12", Author = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2020, 11, 14), CompletionDate = new DateTime(2020, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed, Group = context.Groups.FirstOrDefault(g => g.Number == 2 && g.Flow.Name == "ІС-0") });
+            context.SaveChanges();
+            context.Votings.Add(new Voting() { Name = "Voting 13", Author = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2021, 11, 14), CompletionDate = new DateTime(2021, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Denied });
+            context.SaveChanges();
+            context.Votings.Add(new Voting() { Name = "Voting 14", Author = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2021, 11, 14), CompletionDate = new DateTime(2021, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Denied, Flow = context.Flows.FirstOrDefault(f => f.Name == "ІС-0") });
+            context.SaveChanges();
+        }
+
+        [Test]
+        public async Task GetFilteredAndSortedForUserAsync_ValidUserId_ReturnsRightData()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            AddDataForSpecificTests(context);
+            var service = new VotingService(context, _mapper);
+            var user = context.Users.FirstOrDefault(u => u.Email == "petrenko1@gmail.com");
+            var expectedNames = new string[]
+            {
+                "Voting 8",
+                "Voting 4",
+                "Voting 7",
+                "Voting 3",
+                "Voting 6",
+                "Voting 2",
+                "Voting 5",
+                "Voting 1"
+            };
+
+            // Act
+            var actualNames = (await service.GetFilteredAndSortedForUserAsync(user.Id)).Select(v => v.Name).ToArray();
+
+            // Assert
+            Assert.AreEqual(expectedNames.Length, actualNames.Length, "Arrays do not have the same Length");
+            for (int i = 0; i < expectedNames.Length; i++)
+            {
+                Assert.AreEqual(expectedNames[i], actualNames[i], "Votings are sorted in the wrong order");
+            }
+        }
+
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        public void GetFilteredAndSortedForUserAsync_NullOrEmptyUserId_ThrowsArgumentNullException(string userId)
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.GetFilteredAndSortedForUserAsync(userId),
+                "Method does not throw an ArgumentNullException if user id is null or empty");
+        }
+
+        [Test]
+        public void GetFilteredAndSortedForUserAsync_InvalidUserId_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var userId = "invalid";
+
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await service.GetFilteredAndSortedForUserAsync(userId),
+                "Method does not throw an InvalidOperationException if user id is invalid");
+        }
+
+        [Test]
+        public async Task GetFilteredAndSortedForAdminAsync_ReturnsRightData()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            AddDataForSpecificTests(context);
+            var service = new VotingService(context, _mapper);
+            var expectedNames = new string[]
+            {
+                "Voting 5",
+                "Voting 6",
+                "Voting 7",
+                "Voting 8",
+                "Voting 1",
+                "Voting 2",
+                "Voting 3",
+                "Voting 4",
+                "Voting 13",
+                "Voting 14",
+                "Voting 9",
+                "Voting 10",
+                "Voting 11",
+                "Voting 12"
+            };
+
+            // Act
+            var actualNames = (await service.GetFilteredAndSortedForAdminAsync()).Select(v => v.Name).ToArray();
+
+            // Assert
+            Assert.AreEqual(expectedNames.Length, actualNames.Length, "Arrays do not have the same Length");
+            for (int i = 0; i < expectedNames.Length; i++)
+            {
+                Assert.AreEqual(expectedNames[i], actualNames[i], "Votings are sorted in the wrong order");
+            }
+        }
+
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        public void GetUserVotingsAsync_NullOrEmptyUserId_ThrowsArgumentNullException(string userId)
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.GetFilteredAndSortedForUserAsync(userId),
+                "Method does not throw an ArgumentNullException if user id is null or empty");
+        }
+
+        [Test]
+        public void GetUserVotingsAsync_InvalidUserId_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var userId = "invalid";
+
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await service.GetFilteredAndSortedForUserAsync(userId),
+                "Method does not throw an InvalidOperationException if user id is invalid");
+        }
+
+        [Test]
+        public async Task GetUserVotingsAsync_ValidUserId_ReturnsRightData()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            AddDataForSpecificTests(context);
+            var service = new VotingService(context, _mapper);
+            var user = context.Users.FirstOrDefault(u => u.Email == "petrenko1@gmail.com");
+            var expectedNames = new string[]
+            {
+                "Voting 1",
+                "Voting 2"
+            };
+
+            // Act
+            var actualNames = (await service.GetUserVotingsAsync(user.Id)).Select(v => v.Name).ToArray();
+
+            // Assert
+            Assert.AreEqual(expectedNames.Length, actualNames.Length, "Arrays do not have the same Length");
+            for (int i = 0; i < expectedNames.Length; i++)
+            {
+                Assert.AreEqual(expectedNames[i], actualNames[i], "Votings are sorted in the wrong order");
+            }
         }
     }
 }

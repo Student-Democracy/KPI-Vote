@@ -22,6 +22,8 @@ namespace DAL.Entities
 
         public decimal MinimalForPercentage { get; set; }
 
+        public decimal MinimalAttendancePercentage { get; set; }
+
         public DateTime CreationDate { get; set; }
 
         public DateTime CompletionDate { get; set; }

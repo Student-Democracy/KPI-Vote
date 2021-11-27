@@ -25,6 +25,8 @@ namespace BLL.Services
 
         private const short _maxVisibilityTerm = 31;
 
+        private const decimal _minForPercentage = 50.0m;
+
         public VotingService(ApplicationContext context, IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context), "Context cannot be null");
@@ -45,8 +47,11 @@ namespace BLL.Services
             if (model.Description.Length < _minDescriptionLength)
                 throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters",
                     nameof(model));
-            if (model.MinimalForPercentage <= 0)
-                throw new ArgumentException($"Model's minimal for percentage cannot be less than or equal 0", 
+            if (model.MinimalForPercentage < _minForPercentage || model.MinimalForPercentage > 100)
+                throw new ArgumentException($"Model's minimal for percentage cannot be less than {_minForPercentage} or bigger than 100", 
+                    nameof(model));
+            if (model.MinimalAttendancePercentage <= 0 || model.MinimalAttendancePercentage > 100)
+                throw new ArgumentException($"Model's minimal attendance percentage cannot be less than or equal 0 or greater than 100",
                     nameof(model));
             model.CreationDate = DateTime.Now;
             if (model.CompletionDate < model.CreationDate)
@@ -96,8 +101,11 @@ namespace BLL.Services
             if (model.Description.Length < _minDescriptionLength)
                 throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters",
                     nameof(model));
-            if (model.MinimalForPercentage <= 0)
-                throw new ArgumentException($"Model's minimal for percentage cannot be less than or equal 0",
+            if (model.MinimalForPercentage < _minForPercentage || model.MinimalForPercentage > 100)
+                throw new ArgumentException($"Model's minimal for percentage cannot be less than or equal {_minForPercentage} or greater than 100",
+                    nameof(model));
+            if (model.MinimalAttendancePercentage <= 0 || model.MinimalAttendancePercentage > 100)
+                throw new ArgumentException($"Model's minimal attendance percentage cannot be less than or equal 0 or greater than 100",
                     nameof(model));
             var existingModel = await _context.Votings.FindAsync(model.Id);
             if (!(existingModel is null) && model.CreationDate != existingModel.CreationDate)
@@ -121,9 +129,11 @@ namespace BLL.Services
 
         public async Task<IEnumerable<VotingModel>> GetFilteredAndSortedForUserAsync(string userId)
         {
+            if (string.IsNullOrEmpty(userId))
+                throw new ArgumentNullException(nameof(userId), "User Id cannot be null");
             var user = await _context.Users.FindAsync(userId);
             if (user is null)
-                throw new ArgumentNullException(nameof(userId), "No such a user");
+                throw new InvalidOperationException("No such a user");
             var activeVotings = await Task.Run(() => _context.Votings.
                 Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status != VotingStatus.Denied));
             var group = await _context.Groups.FindAsync(user.GroupId);
@@ -160,16 +170,18 @@ namespace BLL.Services
             var votings = await Task.Run(() => _context.Votings.
                 Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status != VotingStatus.Denied).
                 OrderByDescending(v => v.CreationDate).
-                AsEnumerable());
+                AsEnumerable());                                    // actual votings
             var oldOrBannedVotings = await Task.Run(() => _context.Votings.
                 Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) < DateTime.Now || v.Status == VotingStatus.Denied).
-                OrderByDescending(v => v.CreationDate));
+                OrderByDescending(v => v.CreationDate));            // archived votings
             votings = await Task.Run(() => votings.Concat(oldOrBannedVotings));
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
         }
 
         public async Task<IEnumerable<VotingModel>> GetUserVotingsAsync(string userId)
         {
+            if (string.IsNullOrEmpty(userId))
+                throw new ArgumentNullException(nameof(userId), "User Id cannot be null");
             var user = await _context.Users.FindAsync(userId);
             if (user is null)
                 throw new ArgumentNullException(nameof(userId), "No such a user");
