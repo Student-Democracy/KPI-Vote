@@ -255,7 +255,6 @@ namespace UnitTests.BLLTests
         [Test]
         [TestCase(-1.1)]
         [TestCase(0)]
-        [TestCase(3)]
         [TestCase(101.1)]
         [TestCase(49.9)]
         public void AddAsync_InvalidMinForPercantage_ThrowsArgumentException(decimal percentage)
@@ -563,10 +562,8 @@ namespace UnitTests.BLLTests
         [Test]
         [TestCase(-1.1)]
         [TestCase(0)]
-        [TestCase(3)]
         [TestCase(49.9)]
         [TestCase(100.1)]
-        [TestCase(126)]
         public void UpdateAsync_InvalidMinForPercantage_ThrowsArgumentException(decimal percentage)
         {
             // Arrange
@@ -598,7 +595,6 @@ namespace UnitTests.BLLTests
         [TestCase(-1.1)]
         [TestCase(0)]
         [TestCase(100.1)]
-        [TestCase(126)]
         public void UpdateAsync_InvalidMinForAttendance_ThrowsArgumentException(decimal percentage)
         {
             // Arrange

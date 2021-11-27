@@ -249,8 +249,12 @@ namespace BLL.Services
                 totalNumber = await Task.Run(() => notBannedUsers
                 .Count());
             }
-            var success = await Task.Run(() => votersNumber / (decimal)totalNumber >= model.MinimalAttendancePercentage 
+            bool success;
+            if (totalNumber != 0 && votersNumber != 0)
+                success = await Task.Run(() => votersNumber / (decimal)totalNumber >= model.MinimalAttendancePercentage
                 && votersForNumber / (decimal)votersNumber >= model.MinimalForPercentage);
+            else
+                success = false;
             return success;
         }
     }
