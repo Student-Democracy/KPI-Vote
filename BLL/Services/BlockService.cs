@@ -18,7 +18,7 @@ namespace BLL.Services
 
         private readonly IMapper _mapper;
 
-        private const short _minHammerLength = 30;
+        private const short _minHammerLength = 10;
 
         public BlockService(ApplicationContext context, IMapper mapper)
         {
@@ -42,11 +42,13 @@ namespace BLL.Services
             if (await _context.Users.FindAsync(model.UserId) is null)
                 throw new ArgumentNullException(nameof(model), "User with such an id was not found");
             if (await _context.Bans.FindAsync(model.UserId) != null)
-                throw new ArgumentException("This user is already blocked", nameof(model));
+                throw new ArgumentException("This user is already blocked", nameof(model)); 
             if (string.IsNullOrEmpty(model.AdminId))
                 throw new ArgumentNullException(nameof(model), "Model's admin id cannot be null or empty");
             if (await _context.Users.FindAsync(model.AdminId) is null)
                 throw new ArgumentNullException(nameof(model), "Admin with such an id was not found");
+            if (model.UserId == model.AdminId)
+                throw new ArgumentException(nameof(model), "Admin cannot block himself/herself");
             await _context.Bans.AddAsync(_mapper.Map<Ban>(model));
             await _context.SaveChangesAsync();
         }
