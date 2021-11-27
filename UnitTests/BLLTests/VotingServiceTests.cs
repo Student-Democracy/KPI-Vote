@@ -182,6 +182,20 @@ namespace UnitTests.BLLTests
         }
 
         [Test]
+        public void AddAsync_NullModel_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            VotingModel votingModel = null;
+            var expectedCount = context.Votings.Count() + 1;
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddAsync(votingModel),
+                "Method does not throw an ArgumentNullException if model is null");
+        }
+
+        [Test]
         public void AddAsync_TooLongName_ThrowsArgumentException()
         {
             // Arrange
@@ -324,7 +338,7 @@ namespace UnitTests.BLLTests
             var votingModel = new VotingModel()
             {
                 Id = context.Votings.FirstOrDefault(v => v.Name == "Voting 1").Id,
-                Name = "Voting 1",
+                Name = "Not the Voting 1",
                 Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
                 "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
@@ -406,6 +420,20 @@ namespace UnitTests.BLLTests
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.UpdateAsync(votingModel),
                 "Method does not throw an ArgumentNullException if voting's description is null");
+        }
+
+        [Test]
+        public void UpdateAsync_NullModel_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            VotingModel votingModel = null;
+            var expectedCount = context.Votings.Count() + 1;
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.UpdateAsync(votingModel),
+                "Method does not throw an ArgumentNullException if model is null");
         }
 
         [Test]

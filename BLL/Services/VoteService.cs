@@ -24,6 +24,8 @@ namespace BLL.Services
         }
         public async Task AddAsync(VoteModel model)
         {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
             if (await _context.Votings.FindAsync(model.VotingId) is null)
                 throw new ArgumentException("Voting with such an id was not found", nameof(model));
             if (model.UserId is null)

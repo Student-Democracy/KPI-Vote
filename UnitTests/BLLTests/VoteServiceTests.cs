@@ -133,7 +133,20 @@ namespace UnitTests.BLLTests
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddAsync(voteModel),
-                "Method does not throw an ArgumentException if user id is null");
+                "Method does not throw an ArgumentNullException if user id is null");
+        }
+
+        [Test]
+        public void AddAsync_NullModel_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VoteService(context, _mapper);
+            VoteModel voteModel = null;
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddAsync(voteModel),
+                "Method does not throw an ArgumentNullException if model is null");
         }
 
         [Test]
