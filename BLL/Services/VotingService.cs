@@ -21,6 +21,8 @@ namespace BLL.Services
 
         private const short _minDescriptionLength = 400;
 
+        private const short _maxNameLength = 250;
+
         public VotingService(ApplicationContext context, IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context), "Context cannot be null");
@@ -31,11 +33,14 @@ namespace BLL.Services
         {
             if (string.IsNullOrEmpty(model.Name))
                 throw new ArgumentNullException(nameof(model), "Model's name cannot be null or empty");
+            if (model.Name.Length > _maxNameLength)
+                throw new ArgumentException($"Model's name cannot contain more than {_maxNameLength} characters",
+                    nameof(model));
             if (string.IsNullOrEmpty(model.Description))
                 throw new ArgumentNullException(nameof(model), "Model's description cannot be null or empty");
             if (model.Description.Length < _minDescriptionLength)
-                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters", 
-                    model.Description);
+                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters",
+                    nameof(model));
             if (model.MinimalForPercentage <= 0)
                 throw new ArgumentException($"Model's minimal for percentage cannot be less than or equal 0", 
                     nameof(model));
@@ -49,7 +54,7 @@ namespace BLL.Services
             if (string.IsNullOrEmpty(model.AuthorId))
                 throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
             if (await _context.Users.FindAsync(model.AuthorId) is null)
-                throw new ArgumentException(nameof(model), "Author with such an id was not found");
+                throw new ArgumentException("Author with such an id was not found", nameof(model));
             await _context.Votings.AddAsync(_mapper.Map<Voting>(model));
             await _context.SaveChangesAsync();
         }
@@ -77,11 +82,14 @@ namespace BLL.Services
         {
             if (string.IsNullOrEmpty(model.Name))
                 throw new ArgumentNullException(nameof(model), "Model's name cannot be null or empty");
+            if (model.Name.Length > _maxNameLength)
+                throw new ArgumentException($"Model's name cannot contain more than {_maxNameLength} characters",
+                    nameof(model));
             if (string.IsNullOrEmpty(model.Description))
                 throw new ArgumentNullException(nameof(model), "Model's description cannot be null or empty");
             if (model.Description.Length < _minDescriptionLength)
                 throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters",
-                    model.Description);
+                    nameof(model));
             if (model.MinimalForPercentage <= 0)
                 throw new ArgumentException($"Model's minimal for percentage cannot be less than or equal 0",
                     nameof(model));
@@ -94,7 +102,7 @@ namespace BLL.Services
             if (string.IsNullOrEmpty(model.AuthorId))
                 throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
             if (await _context.Users.FindAsync(model.AuthorId) is null)
-                throw new ArgumentNullException(nameof(model), "Author with such an id was not found");
+                throw new ArgumentException("Author with such an id was not found", nameof(model));
             _context.Votings.Update(_mapper.Map<Voting>(model));
             await _context.SaveChangesAsync();
         }
