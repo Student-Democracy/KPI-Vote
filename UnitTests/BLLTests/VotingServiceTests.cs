@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace UnitTests.BLLTests
 {
+    [TestFixture]
     public class VotingServiceTests
     {
         private IMapper _mapper;

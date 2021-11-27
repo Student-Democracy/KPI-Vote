@@ -25,10 +25,12 @@ namespace BLL.Services
         public async Task AddAsync(VoteModel model)
         {
             if (await _context.Votings.FindAsync(model.VotingId) is null)
-                throw new ArgumentNullException(nameof(model), "Voting with such an id was not found");
+                throw new ArgumentException(nameof(model), "Voting with such an id was not found");
+            if (model.UserId is null)
+                throw new ArgumentNullException(nameof(model), "User id cannot be null");
             if (await _context.Users.FindAsync(model.UserId) is null)
-                throw new ArgumentNullException(nameof(model), "User with such an id was not found");
-            if (await _context.Votes.FindAsync(model.UserId, model.VotingId) != null)
+                throw new ArgumentException(nameof(model), "User with such an id was not found");
+            if (await _context.Votes.FindAsync(model.VotingId, model.UserId) != null)
                 throw new ArgumentException("Such a vote already exists", nameof(model));
             await _context.Votes.AddAsync(_mapper.Map<Vote>(model));
             await _context.SaveChangesAsync();
@@ -41,7 +43,7 @@ namespace BLL.Services
 
         public async Task<VoteModel> GetByIdAsync(string userId, int votingId)
         {
-            Vote found = await _context.Votes.FindAsync(votingId, userId);
+            var found = await _context.Votes.FindAsync(votingId, userId);
             return _mapper.Map<VoteModel>(found);
         }
     }
