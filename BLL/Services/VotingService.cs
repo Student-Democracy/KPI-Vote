@@ -213,7 +213,7 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Model cannot be null");
             if (model.Status != VotingStatus.Confirmed)
                 throw new ArgumentException("Voting should be confirmed", nameof(model));
-            if (model.CompletionDate <= DateTime.Now)
+            if (model.CompletionDate >= DateTime.Now)
                 throw new ArgumentException("Voting should be completed", nameof(model));
             int totalNumber;
             var votes = await Task.Run(() => _context.Votes.Where(v => v.VotingId == model.Id));
