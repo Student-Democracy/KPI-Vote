@@ -57,7 +57,11 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Number of group < 0 or >=10");
             if (await _context.Flows.FindAsync(model.FlowId) is null)
                 throw new ArgumentNullException(nameof(model), "Flow with such an id was not found");
-            _context.Groups.Update(_mapper.Map<Group>(model));
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
+            var existingModel = await _context.Groups.FindAsync(model.Id);
+            existingModel = _mapper.Map(model, existingModel);
+            _context.Groups.Update(existingModel);
             await _context.SaveChangesAsync();
         }
     }
