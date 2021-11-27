@@ -20,6 +20,14 @@ namespace BLL
                 .ForMember(p => p.UserIds, c => c.MapFrom(group => group.Users.Select(user => user.Id)))
                 .ForMember(p => p.VotingIds, c => c.MapFrom(group => group.Votings.Select(voting => voting.Id)))
                 .ReverseMap();
+            CreateMap<Flow, FlowModel>()
+                .ForMember(p => p.GroupIds, c => c.MapFrom(flow => flow.Groups.Select(group => group.Id)))
+                .ForMember(p => p.VotingIds, c => c.MapFrom(flow => flow.Votings.Select(voting => voting.Id)))
+                .ReverseMap();
+            CreateMap<Faculty, FacultyModel>()
+                .ForMember(p => p.FlowIds, c => c.MapFrom(flow => flow.Flows.Select(flow => flow.Id)))
+                .ForMember(p => p.VotingIds, c => c.MapFrom(flow => flow.Votings.Select(voting => voting.Id)))
+                .ReverseMap();
             CreateMap<Ban, BlockModel>().ReverseMap();
         }
     }

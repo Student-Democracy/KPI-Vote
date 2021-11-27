@@ -18,8 +18,8 @@ namespace BLL.Models
         public int FacultyId { get; set; }
 
 
-        public ICollection<Group> Groups { get; set; }
+        public ICollection<int> FlowIds { get; set; }
 
-        public ICollection<Voting> Votings { get; set; }
+        public ICollection<int> VotingIds { get; set; }
     }
 }
