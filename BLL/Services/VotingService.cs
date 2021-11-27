@@ -31,6 +31,8 @@ namespace BLL.Services
 
         public async Task AddAsync(VotingModel model)
         {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
             if (string.IsNullOrEmpty(model.Name))
                 throw new ArgumentNullException(nameof(model), "Model's name cannot be null or empty");
             if (model.Name.Length > _maxNameLength)
@@ -48,8 +50,8 @@ namespace BLL.Services
             if (model.CompletionDate < model.CreationDate)
                 throw new ArgumentException($"Model's completion date cannot be less than creation date",
                     nameof(model));
-            if (model.VisibilityTerm <= 0)
-                throw new ArgumentException($"Model's visibility term cannot be less than or equal 0",
+            if (model.VisibilityTerm <= 0 || model.VisibilityTerm > 30)
+                throw new ArgumentException($"Model's visibility term is invalid",
                     nameof(model));
             if (string.IsNullOrEmpty(model.AuthorId))
                 throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
@@ -80,6 +82,8 @@ namespace BLL.Services
 
         public async Task UpdateAsync(VotingModel model)
         {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
             if (string.IsNullOrEmpty(model.Name))
                 throw new ArgumentNullException(nameof(model), "Model's name cannot be null or empty");
             if (model.Name.Length > _maxNameLength)
@@ -96,8 +100,8 @@ namespace BLL.Services
             if (model.CompletionDate < model.CreationDate)
                 throw new ArgumentException($"Model's completion date cannot be less than creation date",
                     nameof(model));
-            if (model.VisibilityTerm <= 0)
-                throw new ArgumentException($"Model's visibility term cannot be less than or equal 0",
+            if (model.VisibilityTerm <= 0 || model.VisibilityTerm > 30)
+                throw new ArgumentException($"Model's visibility term is invalid",
                     nameof(model));
             if (string.IsNullOrEmpty(model.AuthorId))
                 throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
@@ -170,6 +174,15 @@ namespace BLL.Services
                 .OrderByDescending(v => v.CreationDate)
                 .AsEnumerable());
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
+        }
+
+        public async Task ChangeStatusAsync(VotingModel model)
+        {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
+            if (model.StatusSetterId is null)
+                throw new ArgumentException("Status setter's id cannot be null", nameof(model));
+            await UpdateAsync(model);
         }
     }
 }

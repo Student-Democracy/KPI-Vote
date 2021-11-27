@@ -14,5 +14,7 @@ namespace BLL.Interfaces
         Task<IEnumerable<VotingModel>> GetFilteredAndSortedForAdminAsync();
 
         Task<IEnumerable<VotingModel>> GetUserVotingsAsync(string userId);
+
+        Task ChangeStatusAsync(VotingModel model);
     }
 }
