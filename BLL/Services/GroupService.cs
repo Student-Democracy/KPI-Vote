@@ -44,12 +44,11 @@ namespace BLL.Services
         }
         public IEnumerable<GroupModel> GetAll()
         {
-            return _mapper.Map<IEnumerable<GroupModel>>(_context.Groups);
+            return _mapper.Map<IEnumerable<GroupModel>>(_context.Groups.Include(v => v.Users).Include(v => v.Votings));
         }
-
         public async Task<GroupModel> GetByIdAsync(int id)
         {
-            return _mapper.Map<GroupModel>(await _context.Groups.SingleOrDefaultAsync(v => v.Id == id));
+            return _mapper.Map<GroupModel>(await _context.Groups.Include(v => v.Users).Include(v => v.Votings).SingleOrDefaultAsync(v => v.Id == id));
         }
 
         public async Task UpdateAsync(GroupModel model)

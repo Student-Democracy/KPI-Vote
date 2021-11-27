@@ -23,7 +23,7 @@ namespace UnitTests.BLLTests
         {
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
             // Arrange
-            var expected = context.Groups.ToArray();
+            var expected = context.Groups.Include(v => v.Users).Include(v => v.Votings).ToArray();
             var service = new GroupService(context, _mapper);
 
             // Act
@@ -45,7 +45,7 @@ namespace UnitTests.BLLTests
         {
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
             // Arrange
-            var expected = await context.Groups.SingleOrDefaultAsync(v => v.Id == id);
+            var expected = await context.Groups.Include(v => v.Users).Include(v => v.Votings).SingleOrDefaultAsync(v => v.Id == id);
             var service = new GroupService(context, _mapper);
 
             // Act
