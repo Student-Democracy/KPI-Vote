@@ -41,7 +41,7 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Model's user id cannot be null or empty");
             if (await _context.Users.FindAsync(model.UserId) is null)
                 throw new ArgumentNullException(nameof(model), "User with such an id was not found");
-            if (await _context.Bans.FindAsync(model.UserId) != null)
+            if (await _context.Bans.FindAsync(model.Id) != null)
                 throw new ArgumentException("This user is already blocked", nameof(model)); 
             if (string.IsNullOrEmpty(model.AdminId))
                 throw new ArgumentNullException(nameof(model), "Model's admin id cannot be null or empty");
@@ -86,7 +86,7 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Model's user id cannot be null or empty");
             if (await _context.Users.FindAsync(model.UserId) is null)
                 throw new ArgumentNullException(nameof(model), "User with such an id was not found");
-            if (await _context.Bans.FindAsync(model.UserId) != null)
+            if (await _context.Bans.SingleOrDefaultAsync(p => p.UserId == model.UserId) != null)
                 throw new ArgumentException("This user is already blocked", nameof(model));
             if (string.IsNullOrEmpty(model.AdminId))
                 throw new ArgumentNullException(nameof(model), "Model's admin id cannot be null or empty");
