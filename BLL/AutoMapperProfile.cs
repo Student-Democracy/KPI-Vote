@@ -16,6 +16,7 @@ namespace BLL
                 .ReverseMap();
             CreateMap<Vote, VoteModel>().ReverseMap();
             CreateMap<Appeal, AppealModel>().ReverseMap();
+            CreateMap<Group, GroupModel>().ReverseMap();
         }
     }
 }
