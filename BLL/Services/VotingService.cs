@@ -49,7 +49,7 @@ namespace BLL.Services
             if (string.IsNullOrEmpty(model.AuthorId))
                 throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
             if (await _context.Users.FindAsync(model.AuthorId) is null)
-                throw new ArgumentNullException(nameof(model), "Author with such an id was not found");
+                throw new ArgumentException(nameof(model), "Author with such an id was not found");
             await _context.Votings.AddAsync(_mapper.Map<Voting>(model));
             await _context.SaveChangesAsync();
         }

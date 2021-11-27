@@ -14,8 +14,8 @@ namespace BLL.Models
 
         public int FlowId { get; set; }
 
-        public ICollection<User> Users { get; set; }
+        public ICollection<string> UserIds { get; set; }
 
-        public ICollection<Voting> Votings { get; set; }
+        public ICollection<int> VotingIds { get; set; }
     }
 }

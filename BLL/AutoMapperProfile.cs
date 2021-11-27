@@ -16,7 +16,10 @@ namespace BLL
                 .ReverseMap();
             CreateMap<Vote, VoteModel>().ReverseMap();
             CreateMap<Appeal, AppealModel>().ReverseMap();
-            CreateMap<Group, GroupModel>().ReverseMap();
+            CreateMap<Group, GroupModel>()
+                .ForMember(p => p.UserIds, c => c.MapFrom(group => group.Users.Select(user => user.Id)))
+                .ForMember(p => p.VotingIds, c => c.MapFrom(group => group.Votings.Select(voting => voting.Id)))
+                .ReverseMap();
             CreateMap<Ban, BlockModel>().ReverseMap();
         }
     }

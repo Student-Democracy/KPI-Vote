@@ -35,8 +35,8 @@ namespace UnitTests.BLLTests
             {
                 Assert.AreEqual(expected[i].Id, actual[i].Id, "Elements' ids are not equal");
                 Assert.AreEqual(expected[i].Number, actual[i].Number, "Elements' numbers are not equal");
-                Assert.AreEqual(expected[i].Users.Count, actual[i].Users.Count, "Elements' users counts are not equal");
-                Assert.AreEqual(expected[i].Votings.Count, actual[i].Votings.Count, "Elements' votings counts are not equal");
+                Assert.AreEqual(expected[i].Users.Count, actual[i].UserIds.Count, "Elements' users counts are not equal");
+                Assert.AreEqual(expected[i].Votings.Count, actual[i].VotingIds.Count, "Elements' votings counts are not equal");
             }
         }
 
@@ -56,8 +56,8 @@ namespace UnitTests.BLLTests
             // Assert
             Assert.AreEqual(expected.Id, actual.Id, "Elements' ids are not equal");
             Assert.AreEqual(expected.Number, actual.Number, "Elements' Number are not equal");
-            Assert.AreEqual(expected.Users.Count, actual.Users.Count, "Elements' users counts are not equal");
-            Assert.AreEqual(expected.Votings.Count, actual.Votings.Count, "Elements' votings counts are not equal");
+            Assert.AreEqual(expected.Users.Count, actual.UserIds.Count, "Elements' users counts are not equal");
+            Assert.AreEqual(expected.Votings.Count, actual.VotingIds.Count, "Elements' votings counts are not equal");
         }
     }
 }
