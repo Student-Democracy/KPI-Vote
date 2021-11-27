@@ -58,7 +58,7 @@ namespace BLL.Services
             if (string.IsNullOrEmpty(model.AuthorId))
                 throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
             if (await _context.Users.FindAsync(model.AuthorId) is null)
-                throw new ArgumentException("Author with such an id was not found", nameof(model));
+                throw new InvalidOperationException("Author with such an id was not found");
             await _context.Votings.AddAsync(_mapper.Map<Voting>(model));
             await _context.SaveChangesAsync();
         }
@@ -67,7 +67,7 @@ namespace BLL.Services
         {
             var model = await _context.Votings.FindAsync(id);
             if (model is null)
-                throw new ArgumentNullException(nameof(id), "Voting with such an id was not found");
+                throw new InvalidOperationException("Voting with such an id was not found");
             _context.Votings.Remove(model);
             await _context.SaveChangesAsync();
         }
@@ -113,7 +113,7 @@ namespace BLL.Services
             if (string.IsNullOrEmpty(model.AuthorId))
                 throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
             if (await _context.Users.FindAsync(model.AuthorId) is null)
-                throw new ArgumentException("Author with such an id was not found", nameof(model));
+                throw new InvalidOperationException("Author with such an id was not found");
             existingModel = _mapper.Map(model, existingModel);
             _context.Votings.Update(existingModel);
             await _context.SaveChangesAsync();
@@ -189,7 +189,9 @@ namespace BLL.Services
             if (model is null)
                 throw new ArgumentNullException(nameof(model), "Model cannot be null");
             if (model.StatusSetterId is null)
-                throw new ArgumentException("Status setter's id cannot be null", nameof(model));
+                throw new ArgumentNullException(nameof(model), "Status setter's id cannot be null");
+            if (await _context.Users.FindAsync(model.StatusSetterId) is null)
+                throw new InvalidOperationException("Status setter's was not found");
             await UpdateAsync(model);
         }
     }

@@ -391,7 +391,6 @@ namespace UnitTests.BLLTests
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
-            var expectedCount = context.Votings.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.UpdateAsync(votingModel),
@@ -415,7 +414,6 @@ namespace UnitTests.BLLTests
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
-            var expectedCount = context.Votings.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.UpdateAsync(votingModel),
@@ -429,7 +427,6 @@ namespace UnitTests.BLLTests
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
             var service = new VotingService(context, _mapper);
             VotingModel votingModel = null;
-            var expectedCount = context.Votings.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.UpdateAsync(votingModel),
@@ -457,7 +454,6 @@ namespace UnitTests.BLLTests
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "pivo@gmail.com").Id
             };
-            var expectedCount = context.Votings.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.UpdateAsync(votingModel),
@@ -488,7 +484,6 @@ namespace UnitTests.BLLTests
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
-            var expectedCount = context.Votings.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.UpdateAsync(votingModel),
@@ -512,7 +507,6 @@ namespace UnitTests.BLLTests
                 CreationDate = new DateTime(2021, 11, 14),
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
-            var expectedCount = context.Votings.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.UpdateAsync(votingModel),
@@ -542,7 +536,6 @@ namespace UnitTests.BLLTests
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
-            var expectedCount = context.Votings.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.UpdateAsync(votingModel),
@@ -573,7 +566,6 @@ namespace UnitTests.BLLTests
                 CreationDate = new DateTime(2021, 11, 14),
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
-            var expectedCount = context.Votings.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.UpdateAsync(votingModel),
@@ -601,7 +593,6 @@ namespace UnitTests.BLLTests
                 CreationDate = new DateTime(2021, 11, 14),
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
-            var expectedCount = context.Votings.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.UpdateAsync(votingModel),
@@ -629,11 +620,148 @@ namespace UnitTests.BLLTests
                 VisibilityTerm = 5,
                 AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
-            var expectedCount = context.Votings.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.UpdateAsync(votingModel),
                 "Method does not throw an ArgumentException if the creation date is changed");
+        }
+
+        [Test]
+        public async Task ChangeStatusAsync_ValidVote_ChangesStatus()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var votingModel = new VotingModel()
+            {
+                Id = context.Votings.FirstOrDefault(v => v.Name == "Voting 1").Id,
+                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
+                Name = "Voting 1",
+                AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id,
+                CreationDate = new DateTime(2021, 11, 14),
+                CompletionDate = new DateTime(2021, 12, 15),
+                VisibilityTerm = 5,
+                MinimalForPercentage = 5.5M,
+                StatusSetterId = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com").Id,
+                Status = VotingStatus.Denied
+            };
+
+            // Act
+            await service.ChangeStatusAsync(_mapper.Map<VotingModel>(votingModel));
+
+            // Assert
+            var updatedVoting = context.Votings.FirstOrDefault(v => v.Id == votingModel.Id);
+            Assert.AreEqual(votingModel.StatusSetterId, updatedVoting.StatusSetter.Id,
+                "Elements' status setter's ids are not equal");
+            Assert.AreEqual(votingModel.Status, updatedVoting.Status,
+                "Elements' statuses are not equal");
+        }
+
+        [Test]
+        public void ChangeStatusAsync_NullModel_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            VotingModel votingModel = null;
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.ChangeStatusAsync(votingModel),
+                "Method does not throw an ArgumentNullException if model is null");
+        }
+
+        [Test]
+        public void ChangeStatusAsync_NullStatusSetter_ThrowsArgumentNullException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var votingModel = new VotingModel()
+            {
+                Id = context.Votings.FirstOrDefault(v => v.Name == "Voting 1").Id,
+                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
+                Name = "Voting 1",
+                AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id,
+                CreationDate = new DateTime(2021, 11, 14),
+                CompletionDate = new DateTime(2021, 12, 15),
+                VisibilityTerm = 5,
+                MinimalForPercentage = 5.5M,
+                StatusSetterId = null,
+                Status = VotingStatus.Denied
+            };
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.ChangeStatusAsync(votingModel),
+                "Method does not throw an ArgumentNullException if status setter is null");
+        }
+
+        [Test]
+        public void ChangeStatusAsync_NotFoundStatusSetter_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var votingModel = new VotingModel()
+            {
+                Id = context.Votings.FirstOrDefault(v => v.Name == "Voting 1").Id,
+                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
+                Name = "Voting 1",
+                AuthorId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id,
+                CreationDate = new DateTime(2021, 11, 14),
+                CompletionDate = new DateTime(2021, 12, 15),
+                VisibilityTerm = 5,
+                MinimalForPercentage = 5.5M,
+                StatusSetterId = "NOT FOUND",
+                Status = VotingStatus.Denied
+            };
+
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await service.ChangeStatusAsync(votingModel),
+                "Method does not throw an InvalidOperationException if status setter is not found");
+        }
+
+        [Test]
+        [TestCase(1)]
+        [TestCase(2)]
+        public async Task DeleteByIdAsync_ValidId_DeletesElement(int id)
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var expectedCount = context.Votings.Count() - 1;
+
+            // Act
+            await service.DeleteByIdAsync(id);
+            var actual = context.Votings;
+
+            // Assert
+            Assert.AreEqual(expectedCount, actual.Count(), "The element was not deleted");
+            Assert.AreEqual(await actual.FindAsync(id), null, "Wrong element was deleted");
+        }
+
+        [Test]
+        public void DeleteByIdAsync_NotValidId_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var id = -1;
+
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await service.DeleteByIdAsync(id),
+                "Method does not throw an InvalidOperationException if status setter was not found");
         }
     }
 }

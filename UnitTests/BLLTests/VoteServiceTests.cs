@@ -89,7 +89,7 @@ namespace UnitTests.BLLTests
         }
 
         [Test]
-        public void AddAsync_InvalidVotingId_ThrowsArgumentException()
+        public void AddAsync_InvalidVotingId_ThrowsInvalidOperationException()
         {
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
@@ -100,12 +100,12 @@ namespace UnitTests.BLLTests
             var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = votingId };
 
             // Act & Assert
-            Assert.ThrowsAsync<ArgumentException>(async () => await service.AddAsync(voteModel), 
-                "Method does not throw an ArgumentException if voting id is invalid");
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await service.AddAsync(voteModel),
+                "Method does not throw an InvalidOperationException if voting id is invalid");
         }
 
         [Test]
-        public void AddAsync_InvalidUserId_ThrowsArgumentException()
+        public void AddAsync_InvalidUserId_ThrowsInvalidOperationException()
         {
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
@@ -116,8 +116,8 @@ namespace UnitTests.BLLTests
             var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = votingId };
 
             // Act & Assert
-            Assert.ThrowsAsync<ArgumentException>(async () => await service.AddAsync(voteModel),
-                "Method does not throw an ArgumentException if user id is invalid");
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await service.AddAsync(voteModel),
+                "Method does not throw an InvalidOperationException if user id is invalid");
         }
 
         [Test]
