@@ -23,6 +23,8 @@ namespace BLL.Services
 
         private const short _maxNameLength = 250;
 
+        private const short _maxVisibilityTerm = 31;
+
         public VotingService(ApplicationContext context, IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context), "Context cannot be null");
@@ -50,7 +52,7 @@ namespace BLL.Services
             if (model.CompletionDate < model.CreationDate)
                 throw new ArgumentException($"Model's completion date cannot be less than creation date",
                     nameof(model));
-            if (model.VisibilityTerm <= 0 || model.VisibilityTerm > 30)
+            if (model.VisibilityTerm <= 0 || model.VisibilityTerm > _maxVisibilityTerm)
                 throw new ArgumentException($"Model's visibility term is invalid",
                     nameof(model));
             if (string.IsNullOrEmpty(model.AuthorId))
@@ -97,17 +99,23 @@ namespace BLL.Services
             if (model.MinimalForPercentage <= 0)
                 throw new ArgumentException($"Model's minimal for percentage cannot be less than or equal 0",
                     nameof(model));
+            var existingModel = await _context.Votings.FindAsync(model.Id);
+            if (!(existingModel is null) && model.CreationDate != existingModel.CreationDate)
+                throw new ArgumentException("The creation date cannot be changed", nameof(model));
+            if (!(existingModel is null) && model.AuthorId != existingModel.AuthorId)
+                throw new ArgumentException("Author cannot be changed", nameof(model));
             if (model.CompletionDate < model.CreationDate)
                 throw new ArgumentException($"Model's completion date cannot be less than creation date",
                     nameof(model));
-            if (model.VisibilityTerm <= 0 || model.VisibilityTerm > 30)
+            if (model.VisibilityTerm <= 0 || model.VisibilityTerm > _maxVisibilityTerm)
                 throw new ArgumentException($"Model's visibility term is invalid",
                     nameof(model));
             if (string.IsNullOrEmpty(model.AuthorId))
                 throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
             if (await _context.Users.FindAsync(model.AuthorId) is null)
                 throw new ArgumentException("Author with such an id was not found", nameof(model));
-            _context.Votings.Update(_mapper.Map<Voting>(model));
+            existingModel = _mapper.Map(model, existingModel);
+            _context.Votings.Update(existingModel);
             await _context.SaveChangesAsync();
         }
 

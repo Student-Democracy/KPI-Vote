@@ -91,6 +91,7 @@ namespace UnitTests
             context.Votes.Add(new Vote() { Result = VoteResult.Against, Voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 1"), User = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com") });
             context.Votes.Add(new Vote() { Result = VoteResult.Neutral, Voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 2"), User = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com") });
             context.SaveChanges();
+            //context.Votings.Update(new Voting() { Id = 1, Name = "Sample 1", Author = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2021, 11, 14), CompletionDate = new DateTime(2021, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 5.5M, Status = VotingStatus.Confirmed });
         }
 
         public static Mapper CreateMapperProfile()
