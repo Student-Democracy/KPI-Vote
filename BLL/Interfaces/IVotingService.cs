@@ -17,6 +17,10 @@ namespace BLL.Interfaces
 
         Task ChangeStatusAsync(VotingModel model);
 
-        Task<bool> IsVotingSuccessful(VotingModel model);
+        Task<bool> IsVotingSuccessfulAsync(VotingModel model);
+
+        Task<decimal> GetActualAttendancePercentageAsync(VotingModel model);
+
+        Task<decimal> GetActualForPercentageAsync(VotingModel model);
     }
 }

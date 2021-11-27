@@ -207,7 +207,7 @@ namespace BLL.Services
             await UpdateAsync(model);
         }
 
-        public async Task<bool> IsVotingSuccessful(VotingModel model)
+        public async Task<bool> IsVotingSuccessfulAsync(VotingModel model)
         {
             if (model is null)
                 throw new ArgumentNullException(nameof(model), "Model cannot be null");
@@ -215,14 +215,24 @@ namespace BLL.Services
                 throw new ArgumentException("Voting should be confirmed", nameof(model));
             if (model.CompletionDate >= DateTime.Now)
                 throw new ArgumentException("Voting should be completed", nameof(model));
+            var success = await GetActualAttendancePercentageAsync(model) >= model.MinimalAttendancePercentage
+                && await GetActualForPercentageAsync(model) >= model.MinimalForPercentage;
+            return success;
+        }
+
+        public async Task<decimal> GetActualAttendancePercentageAsync(VotingModel model)
+        {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
+            if (model.Status != VotingStatus.Confirmed)
+                throw new ArgumentException("Voting should be confirmed", nameof(model));
             int totalNumber;
             var votes = await Task.Run(() => _context.Votes.Where(v => v.VotingId == model.Id));
             var votersNumber = await Task.Run(() => votes.Count());
-            var votersForNumber = await Task.Run(() => votes.Where(v => v.Result == VoteResult.For).Count());
             var notBannedUsers = await Task.Run(() => _context.Users
                 .Include(u => u.Bans)
                     .Where(u => !u.Bans
-                    .Any(b => b.DateTo >= DateTime.Now)));
+                    .Any(b => b.DateTo >= model.CompletionDate && b.DateFrom <= model.CreationDate)));
             if (!(model.GroupId is null))
             {
                 totalNumber = await Task.Run(() => notBannedUsers
@@ -249,13 +259,25 @@ namespace BLL.Services
                 totalNumber = await Task.Run(() => notBannedUsers
                 .Count());
             }
-            bool success;
-            if (totalNumber != 0 && votersNumber != 0)
-                success = await Task.Run(() => votersNumber / (decimal)totalNumber >= model.MinimalAttendancePercentage
-                && votersForNumber / (decimal)votersNumber >= model.MinimalForPercentage);
+            if (totalNumber != 0)
+                return await Task.Run(() => votersNumber / (decimal)totalNumber);
             else
-                success = false;
-            return success;
+                return 0m;
+        }
+
+        public async Task<decimal> GetActualForPercentageAsync(VotingModel model)
+        {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
+            if (model.Status != VotingStatus.Confirmed)
+                throw new ArgumentException("Voting should be confirmed", nameof(model));
+            var votes = await Task.Run(() => _context.Votes.Where(v => v.VotingId == model.Id));
+            var votersNumber = await Task.Run(() => votes.Count());
+            var votersForNumber = await Task.Run(() => votes.Where(v => v.Result == VoteResult.For).Count());
+            if (votersNumber != 0)
+                return await Task.Run(() => votersForNumber / (decimal)votersNumber);
+            else
+                return 0;
         }
     }
 }
