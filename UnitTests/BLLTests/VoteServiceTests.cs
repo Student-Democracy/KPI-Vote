@@ -108,6 +108,47 @@ namespace UnitTests.BLLTests
         }
 
         [Test]
+        public void AddAsync_CompletedVoting_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 2");
+            voting.CompletionDate = DateTime.Now.AddDays(-1);
+            context.Votings.Update(voting);
+            context.SaveChanges();
+            var userId = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com").Id;
+            var result = VoteResult.Neutral;
+            var service = new VoteService(context, _mapper);
+            var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = voting.Id };
+
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await service.AddAsync(voteModel),
+                "Method does not throw an InvalidOperationException if voting with such an id is completed");
+        }
+
+        [Test]
+        [TestCase(VotingStatus.Denied)]
+        [TestCase(VotingStatus.NotConfirmed)]
+        public void AddAsync_NotConfirmedVoting_ThrowsInvalidOperationException(VotingStatus status)
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 2");
+            voting.CompletionDate = DateTime.Now.AddDays(1);
+            voting.Status = status;
+            context.Votings.Update(voting);
+            context.SaveChanges();
+            var userId = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com").Id;
+            var result = VoteResult.Neutral;
+            var service = new VoteService(context, _mapper);
+            var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = voting.Id };
+
+            // Act & Assert
+            Assert.ThrowsAsync<InvalidOperationException>(async () => await service.AddAsync(voteModel),
+                "Method does not throw an InvalidOperationException if voting with such an id is not confirmed yet");
+        }
+
+        [Test]
         public void AddAsync_InvalidUserId_ThrowsInvalidOperationException()
         {
             // Arrange

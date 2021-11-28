@@ -19,6 +19,8 @@ namespace UnitTests.BLLTests
     {
         private IMapper _mapper;
 
+        private readonly double floatingTolerance = 1.0 / Math.Pow(10, 2);
+
         [SetUp]
         public void Setup()
         {
@@ -1018,6 +1020,278 @@ namespace UnitTests.BLLTests
             {
                 Assert.AreEqual(expectedNames[i], actualNames[i], "Votings are sorted in the wrong order");
             }
+        }
+
+        [Test]
+        public async Task GetActualForPercentageAsync_ValidVoting_ReturnsRightInfo()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var voting = context.Votings.Find(1);
+            await context.Votes.AddAsync(new Vote() { Result = VoteResult.For, Voting = voting, User = context.Users.FirstOrDefault(user => user.Email == "pivo@gmail.com") });
+            await context.SaveChangesAsync();
+            var expected = 2.0m / 3.0m;
+
+            // Act
+            var actual = await service.GetActualForPercentageAsync(_mapper.Map<VotingModel>(voting));
+
+            // Assert
+            Assert.That(actual, Is.EqualTo(expected).Within(floatingTolerance), "The information is not right");
+        }
+
+        [Test]
+        public async Task GetActualForPercentageAsync_ZeroVotersInVoting_ReturnsRightInfo()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var voting = await context.Votings.FindAsync(4);
+            var expected = 0m;
+
+            // Act
+            var actual = await service.GetActualForPercentageAsync(_mapper.Map<VotingModel>(voting));
+
+            // Assert
+            Assert.That(actual, Is.EqualTo(expected).Within(floatingTolerance), "The information is not right");
+        }
+
+        [Test]
+        public async Task GetActualAttendancePercentageAsync_KPILevel_ReturnsRightInfo()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var voting = await context.Votings.FindAsync(1);
+            var ban1 = await context.Bans.FindAsync(1);
+            ban1.DateFrom = DateTime.MinValue;
+            ban1.DateTo = DateTime.MaxValue;
+            context.Bans.Update(ban1);
+            var ban2 = await context.Bans.FindAsync(2);
+            ban2.DateFrom = DateTime.MinValue;
+            ban2.DateTo = DateTime.MinValue;
+            context.Bans.Update(ban2);
+            await context.SaveChangesAsync();
+            var expected = 2.0m / 6.0m;
+
+            // Act
+            var actual = await service.GetActualAttendancePercentageAsync(_mapper.Map<VotingModel>(voting));
+
+            // Assert
+            Assert.That(actual, Is.EqualTo(expected).Within(floatingTolerance), "The information is not right");
+        }
+
+        [Test]
+        public async Task GetActualAttendancePercentageAsync_FacultyLevel_ReturnsRightInfo()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            await context.AddAsync(new User() { FirstName = "Petro", LastName = "Petrenko", Patronymic = "Petrovich", Email = "petrenko1@gmail.com", TelegramTag = "@petrenko", PasswordHash = "sampleDadcassacsasdefes", PasswordChanged = false, RegistrationDate = new DateTime(2021, 11, 14), Group = context.Groups.Find(1) });
+            await context.SaveChangesAsync();
+            var service = new VotingService(context, _mapper);
+            var voting = await context.Votings.FindAsync(2);
+            var ban1 = await context.Bans.FindAsync(1);
+            ban1.DateFrom = DateTime.MinValue;
+            ban1.DateTo = DateTime.MaxValue;
+            context.Bans.Update(ban1);
+            var ban2 = await context.Bans.FindAsync(2);
+            ban2.DateFrom = DateTime.MinValue;
+            ban2.DateTo = DateTime.MinValue;
+            context.Bans.Update(ban2);
+            await context.SaveChangesAsync();
+            var expected = 1.0m / 7.0m;
+
+            // Act
+            var actual = await service.GetActualAttendancePercentageAsync(_mapper.Map<VotingModel>(voting));
+
+            // Assert
+            Assert.That(actual, Is.EqualTo(expected).Within(floatingTolerance), "The information is not right");
+        }
+
+        [Test]
+        public async Task GetActualAttendancePercentageAsync_FlowLevel_ReturnsRightInfo()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            await context.AddAsync(new User() { FirstName = "Petro", LastName = "Petrenko", Patronymic = "Petrovich", Email = "petrenko78677@gmail.com", TelegramTag = "@petreddnko", PasswordHash = "sampleDadcassacsasdefes", PasswordChanged = false, RegistrationDate = new DateTime(2021, 11, 14), Group = context.Groups.Find(6) });
+            await context.SaveChangesAsync();
+            await context.AddAsync(new User() { FirstName = "Max", LastName = "Petrenko", Patronymic = "Petrovich", Email = "petrenko423234432@gmail.com", TelegramTag = "@petrffasenko", PasswordHash = "sampleDadcassacsasdefes", PasswordChanged = false, RegistrationDate = new DateTime(2021, 11, 14), Group = context.Groups.Find(6) });
+            await context.SaveChangesAsync();
+            var votingId = 3;
+            await context.Votes.AddAsync(new Vote() { Result = VoteResult.For, VotingId = votingId,  UserId = context.Users.Where(u => u.Email == "petrenko78677@gmail.com").FirstOrDefault().Id });
+            await context.SaveChangesAsync();
+            var service = new VotingService(context, _mapper);
+            var voting = await context.Votings.FindAsync(votingId);
+            var ban1 = await context.Bans.FindAsync(1);
+            ban1.DateFrom = DateTime.MinValue;
+            ban1.DateTo = DateTime.MaxValue;
+            context.Bans.Update(ban1);
+            var ban2 = await context.Bans.FindAsync(2);
+            ban2.DateFrom = DateTime.MinValue;
+            ban2.DateTo = DateTime.MinValue;
+            context.Bans.Update(ban2);
+            await context.SaveChangesAsync();
+            var expected = 1.0m / 8.0m;
+
+            // Act
+            var actual = await service.GetActualAttendancePercentageAsync(_mapper.Map<VotingModel>(voting));
+
+            // Assert
+            Assert.That(actual, Is.EqualTo(expected).Within(floatingTolerance), "The information is not right");
+        }
+
+        [Test]
+        public async Task GetActualAttendancePercentageAsync_GroupLevel_ReturnsRightInfo()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var votingId = 4;
+            await context.Votes.AddAsync(new Vote() { Result = VoteResult.For, VotingId = votingId, UserId = context.Users.Where(u => u.Email == "petrenko1@gmail.com").FirstOrDefault().Id });
+            await context.SaveChangesAsync();
+            var service = new VotingService(context, _mapper);
+            var voting = await context.Votings.FindAsync(votingId);
+            var ban1 = await context.Bans.FindAsync(1);
+            ban1.DateFrom = DateTime.MinValue;
+            ban1.DateTo = DateTime.MaxValue;
+            context.Bans.Update(ban1);
+            var ban2 = await context.Bans.FindAsync(2);
+            ban2.DateFrom = DateTime.MinValue;
+            ban2.DateTo = DateTime.MinValue;
+            context.Bans.Update(ban2);
+            await context.SaveChangesAsync();
+            var expected = 1.0m / 6.0m;
+
+            // Act
+            var actual = await service.GetActualAttendancePercentageAsync(_mapper.Map<VotingModel>(voting));
+
+            // Assert
+            Assert.That(actual, Is.EqualTo(expected).Within(floatingTolerance), "The information is not right");
+        }
+
+        [Test]
+        public async Task IsVotingSuccessfulAsync_ValidVotingSmallAttendance_ReturnsFalse()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var votingId = 4;
+            await context.Votes.AddAsync(new Vote() { Result = VoteResult.For, VotingId = votingId, UserId = context.Users.Where(u => u.Email == "petrenko1@gmail.com").FirstOrDefault().Id });
+            await context.SaveChangesAsync();
+            var service = new VotingService(context, _mapper);
+            var voting = await context.Votings.FindAsync(votingId);
+            voting.MinimalAttendancePercentage = 50m;
+            voting.CompletionDate = DateTime.Now.AddDays(-1);
+            context.Votings.Update(voting);
+            await context.SaveChangesAsync();
+            var expected = false;
+
+            // Act
+            var actual = await service.IsVotingSuccessfulAsync(_mapper.Map<VotingModel>(voting));
+
+            // Assert
+            Assert.AreEqual(expected, actual, "Method did not return right data");
+        }
+
+        [Test]
+        public async Task IsVotingSuccessfulAsync_ValidVotingSmallForPercentage_ReturnsFalse()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var votingId = 4;
+            await context.Votes.AddAsync(new Vote() { Result = VoteResult.For, VotingId = votingId, UserId = context.Users.Where(u => u.Email == "petrenko1@gmail.com").FirstOrDefault().Id });
+            await context.Votes.AddAsync(new Vote() { Result = VoteResult.Against, VotingId = votingId, UserId = context.Users.Where(u => u.Email == "sydorenko@gmail.com").FirstOrDefault().Id });
+            await context.Votes.AddAsync(new Vote() { Result = VoteResult.Neutral, VotingId = votingId, UserId = context.Users.Where(u => u.Email == "pivo@gmail.com").FirstOrDefault().Id });
+            await context.SaveChangesAsync();
+            var service = new VotingService(context, _mapper);
+            var voting = await context.Votings.FindAsync(votingId);
+            voting.CompletionDate = DateTime.Now.AddDays(-1);
+            context.Votings.Update(voting);
+            await context.SaveChangesAsync();
+            var expected = false;
+
+            // Act
+            var actual = await service.IsVotingSuccessfulAsync(_mapper.Map<VotingModel>(voting));
+
+            // Assert
+            Assert.AreEqual(expected, actual, "Method did not return right data");
+        }
+
+        [Test]
+        public async Task IsVotingSuccessfulAsync_ValidVoting_ReturnsTrue()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var votingId = 4;
+            await context.Votes.AddAsync(new Vote() { Result = VoteResult.For, VotingId = votingId, UserId = context.Users.Where(u => u.Email == "petrenko1@gmail.com").FirstOrDefault().Id });
+            await context.Votes.AddAsync(new Vote() { Result = VoteResult.For, VotingId = votingId, UserId = context.Users.Where(u => u.Email == "sydorenko@gmail.com").FirstOrDefault().Id });
+            await context.Votes.AddAsync(new Vote() { Result = VoteResult.Neutral, VotingId = votingId, UserId = context.Users.Where(u => u.Email == "pivo@gmail.com").FirstOrDefault().Id });
+            await context.SaveChangesAsync();
+            var service = new VotingService(context, _mapper);
+            var voting = await context.Votings.FindAsync(votingId);
+            voting.CompletionDate = DateTime.Now.AddDays(-1);
+            context.Votings.Update(voting);
+            await context.SaveChangesAsync();
+            var expected = true;
+
+            // Act
+            var actual = await service.IsVotingSuccessfulAsync(_mapper.Map<VotingModel>(voting));
+
+            // Assert
+            Assert.AreEqual(expected, actual, "Method did not return right data");
+        }
+
+        [Test]
+        public void IsVotingSuccessfulAsync_NotCompletedVoting_ThrowsArgumentException()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var votingId = 4;
+            var voting = context.Votings.Find(votingId);
+            voting.CompletionDate = DateTime.Now.AddDays(1);
+            context.Votings.Update(voting);
+            context.SaveChanges();
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentException>(async () => await service.IsVotingSuccessfulAsync(_mapper.Map<VotingModel>(voting)),
+                "Method does not throw an ArgumentException if the voting is not completed yet");
+        }
+
+        [Test]
+        [TestCase(VotingStatus.NotConfirmed)]
+        [TestCase(VotingStatus.Denied)]
+        public void GetActualAttendancePercentageAsync_NotConfirmedVoting_ThrowsArgumentException(VotingStatus status)
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var votingId = 4;
+            var voting = context.Votings.Find(votingId);
+            voting.Status = status;
+            context.Votings.Update(voting);
+            context.SaveChanges();
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentException>(async () => await service.GetActualAttendancePercentageAsync(_mapper.Map<VotingModel>(voting)),
+                "Method does not throw an ArgumentException if the voting status is not \"Confirmed\"");
+        }
+
+        [Test]
+        [TestCase(VotingStatus.NotConfirmed)]
+        [TestCase(VotingStatus.Denied)]
+        public void GetActualForPercentageAsync_NotConfirmedVoting_ThrowsArgumentException(VotingStatus status)
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var service = new VotingService(context, _mapper);
+            var votingId = 4;
+            var voting = context.Votings.Find(votingId);
+            voting.Status = status;
+            context.Votings.Update(voting);
+            context.SaveChanges();
+
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentException>(async () => await service.GetActualForPercentageAsync(_mapper.Map<VotingModel>(voting)),
+                "Method does not throw an ArgumentException if the voting status is not \"Confirmed\"");
         }
     }
 }
