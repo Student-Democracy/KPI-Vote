@@ -70,11 +70,14 @@ namespace UnitTests.BLLTests
         {
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            var votingId = context.Votings.FirstOrDefault(v => v.Name == "Voting 2").Id;
+            var voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 2");
+            voting.CompletionDate = DateTime.Now.AddDays(360);
+            context.Votings.Update(voting);
+            context.SaveChanges();
             var userId = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com").Id;
             var result = VoteResult.Neutral;
             var service = new VoteService(context, _mapper);
-            var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = votingId };
+            var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = voting.Id };
             var expectedCount = context.Votes.Count() + 1;
 
             // Act
@@ -109,11 +112,14 @@ namespace UnitTests.BLLTests
         {
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            var votingId = context.Votings.FirstOrDefault(v => v.Name == "Voting 2").Id;
+            var voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 2");
+            voting.CompletionDate = DateTime.Now.AddDays(360);
+            context.Votings.Update(voting);
+            context.SaveChanges();
             var userId = "INVALID";
             var result = VoteResult.Neutral;
             var service = new VoteService(context, _mapper);
-            var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = votingId };
+            var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = voting.Id };
 
             // Act & Assert
             Assert.ThrowsAsync<InvalidOperationException>(async () => await service.AddAsync(voteModel),
@@ -125,11 +131,14 @@ namespace UnitTests.BLLTests
         {
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            var votingId = context.Votings.FirstOrDefault(v => v.Name == "Voting 2").Id;
+            var voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 2");
+            voting.CompletionDate = DateTime.Now.AddDays(360);
+            context.Votings.Update(voting);
+            context.SaveChanges();
             string userId = null;
             var result = VoteResult.Neutral;
             var service = new VoteService(context, _mapper);
-            var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = votingId };
+            var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = voting.Id };
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddAsync(voteModel),
@@ -154,11 +163,14 @@ namespace UnitTests.BLLTests
         {
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            var votingId = context.Votings.FirstOrDefault(v => v.Name == "Voting 2").Id;
+            var voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 2");
+            voting.CompletionDate = DateTime.Now.AddDays(360);
+            context.Votings.Update(voting);
+            context.SaveChanges();
             var userId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id;
             var result = VoteResult.For;
             var service = new VoteService(context, _mapper);
-            var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = votingId };
+            var voteModel = new VoteModel() { Result = result, UserId = userId, VotingId = voting.Id };
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.AddAsync(voteModel),

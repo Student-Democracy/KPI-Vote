@@ -277,7 +277,7 @@ namespace BLL.Services
             if (votersNumber != 0)
                 return await Task.Run(() => votersForNumber / (decimal)votersNumber);
             else
-                return 0;
+                return 0m;
         }
     }
 }
