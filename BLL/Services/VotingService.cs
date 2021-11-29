@@ -229,41 +229,44 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Model cannot be null");
             if (model.Status != VotingStatus.Confirmed)
                 throw new ArgumentException("Voting should be confirmed", nameof(model));
-            int totalNumber;
+            IEnumerable<User> total;
             var votes = await Task.Run(() => _context.Votes.Where(v => v.VotingId == model.Id));
-            var votersNumber = await Task.Run(() => votes.Count());
             var notBannedUsers = await Task.Run(() => _context.Users
                 .Include(u => u.Bans)
                     .Where(u => !u.Bans
                     .Any(b => b.DateTo >= model.CompletionDate && b.DateFrom <= model.CreationDate)));
             if (!(model.GroupId is null))
             {
-                totalNumber = await Task.Run(() => notBannedUsers
-                .Where(u => u.GroupId == model.GroupId)
-                .Count());
+                total = await Task.Run(() => notBannedUsers
+                .Where(u => u.GroupId == model.GroupId));
             }
             else if (!(model.FlowId is null))
             {
-                totalNumber = await Task.Run(() => notBannedUsers
+                total = await Task.Run(() => notBannedUsers
                 .Include(u => u.Group)
-                .Where(u => u.Group.FlowId == model.FlowId)
-                .Count());
+                .Where(u => u.Group.FlowId == model.FlowId));
             }
             else if (!(model.FacultyId is null))
             {
-                totalNumber = await Task.Run(() => notBannedUsers
+                total = await Task.Run(() => notBannedUsers
                 .Include(u => u.Group)
                 .ThenInclude(g => g.Flow)
-                .Where(u => u.Group.Flow.FacultyId == model.FacultyId)
-                .Count());
+                .Where(u => u.Group.Flow.FacultyId == model.FacultyId));
             }
             else
             {
-                totalNumber = await Task.Run(() => notBannedUsers
-                .Count());
+                total = await Task.Run(() => notBannedUsers);
+            }
+            var totalNumber = await Task.Run(() => total.Count());
+            var votesNumber = await Task.Run(() => votes.Count());
+            var totalIdsOnly = await Task.Run(() => total.Select(u => u.Id));
+            foreach(var vote in votes)
+            {
+                if (!totalIdsOnly.Contains(vote.UserId))
+                    totalNumber++;
             }
             if (totalNumber != 0)
-                return await Task.Run(() => votersNumber / (decimal)totalNumber);
+                return await Task.Run(() => votesNumber / (decimal)totalNumber);
             else
                 return 0m;
         }
