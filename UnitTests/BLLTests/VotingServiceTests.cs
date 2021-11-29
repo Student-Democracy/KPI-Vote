@@ -971,6 +971,36 @@ namespace UnitTests.BLLTests
         }
 
         [Test]
+        public async Task GetNotConfirmedAsync_ReturnsRightData()
+        {
+            // Arrange
+            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            await context.Votings.AddAsync(new Voting() { Name = "Voting 5", Author = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2021, 2, 14), CompletionDate = new DateTime(2021, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.NotConfirmed });
+            await context.Votings.AddAsync(new Voting() { Name = "Voting 6", Author = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2022, 1, 14), CompletionDate = new DateTime(2022, 7, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.NotConfirmed, Faculty = context.Faculties.FirstOrDefault(f => f.Name == "ФІОТ") });
+            await context.Votings.AddAsync(new Voting() { Name = "Voting 7", Author = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2020, 11, 14), CompletionDate = new DateTime(2020, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.NotConfirmed, Flow = context.Flows.FirstOrDefault(f => f.Name == "ІС-0") });
+            await context.Votings.AddAsync(new Voting() { Name = "Voting 8", Author = context.Users.FirstOrDefault(user => user.Email == "sydorenko@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2022, 1, 14), CompletionDate = new DateTime(2022, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed, Group = context.Groups.FirstOrDefault(g => g.Number == 2 && g.Flow.Name == "ІС-0") });
+            await context.Votings.AddAsync(new Voting() { Name = "Voting 9", Author = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), StatusSetter = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), CreationDate = new DateTime(2020, 11, 14), CompletionDate = new DateTime(2020, 12, 15), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Denied });
+            await context.SaveChangesAsync();
+            var service = new VotingService(context, _mapper);
+            var expectedNames = new string[]
+            {
+                "Voting 7",
+                "Voting 5",
+                "Voting 6"
+            };
+
+            // Act
+            var actualNames = (await service.GetNotConfirmedAsync()).Select(v => v.Name).ToArray();
+
+            // Assert
+            Assert.AreEqual(expectedNames.Length, actualNames.Length, "Arrays do not have the same Length");
+            for (int i = 0; i < expectedNames.Length; i++)
+            {
+                Assert.AreEqual(expectedNames[i], actualNames[i], "Votings are sorted in the wrong order");
+            }
+        }
+
+        [Test]
         [TestCase(null)]
         [TestCase("")]
         public void GetUserVotingsAsync_NullOrEmptyUserId_ThrowsArgumentNullException(string userId)

@@ -134,8 +134,9 @@ namespace BLL.Services
             var user = await _context.Users.FindAsync(userId);
             if (user is null)
                 throw new InvalidOperationException("No such a user");
-            var activeVotings = await Task.Run(() => _context.Votings.
-                Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status == VotingStatus.Confirmed));
+            var activeVotings = await Task.Run(() => _context.Votings
+                .Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status == VotingStatus.Confirmed)
+                .Include(v => v.Votes));
             var group = await _context.Groups.FindAsync(user.GroupId);
             Flow flow = null;
             Faculty faculty = null;
@@ -169,10 +170,12 @@ namespace BLL.Services
         {
             var votings = await Task.Run(() => _context.Votings.
                 Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status != VotingStatus.Denied).
+                Include(v => v.Votes).
                 OrderByDescending(v => v.CreationDate).
                 AsEnumerable());                                    // actual votings
             var oldOrBannedVotings = await Task.Run(() => _context.Votings.
                 Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) < DateTime.Now || v.Status == VotingStatus.Denied).
+                Include(v => v.Votes).
                 OrderByDescending(v => v.CreationDate));            // archived votings
             votings = await Task.Run(() => votings.Concat(oldOrBannedVotings));
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
@@ -278,6 +281,15 @@ namespace BLL.Services
                 return await Task.Run(() => votersForNumber / (decimal)votersNumber);
             else
                 return 0m;
+        }
+
+        public async Task<IEnumerable<VotingModel>> GetNotConfirmedAsync()
+        {
+            var votings = await Task.Run(() => _context.Votings
+                .Where(v => v.Status == VotingStatus.NotConfirmed)
+                .Include(v => v.Votes)
+                .OrderBy(v => v.CreationDate));
+            return _mapper.Map<IEnumerable<VotingModel>>(votings);
         }
     }
 }
