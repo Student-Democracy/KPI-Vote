@@ -135,7 +135,7 @@ namespace BLL.Services
             if (user is null)
                 throw new InvalidOperationException("No such a user");
             var activeVotings = await Task.Run(() => _context.Votings.
-                Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status != VotingStatus.Denied));
+                Where(v => v.CompletionDate.AddDays(v.VisibilityTerm) >= DateTime.Now && v.Status == VotingStatus.Confirmed));
             var group = await _context.Groups.FindAsync(user.GroupId);
             Flow flow = null;
             Faculty faculty = null;
