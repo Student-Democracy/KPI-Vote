@@ -63,7 +63,7 @@ namespace UnitTests.BLLTests
             Assert.AreEqual(expected.Votings.Count, actual.VotingIds.Count, "Elements' votings counts are not equal");
         }
         [Test]
-        public async Task AddAsync_ValidBan_AddsElement()
+        public async Task AddAsync_ValidBans_AddsElement()
         {
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
@@ -71,18 +71,18 @@ namespace UnitTests.BLLTests
             var groupModel = new GroupModel()
             {
                 CreationDate = DateTime.Now.AddDays(2),
-                FlowId = Int32.Parse(context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id)
+                FlowId = Int32.Parse(context.Groups.FirstOrDefault(Group => Group.FlowId == /*Я не знаю шо тут писати, Нікіта хелп*/).FlowId)
             };
-            var expectedCount = context.Groups.Count() + 1;
+            var expectedCount = context.Bans.Count() + 1;
 
             // Act
             await service.AddAsync(groupModel);
 
             // Assert
-            Assert.AreEqual(expectedCount, context.Groups.Count(), "The element was not added");
-            var addedBan = context.Groups.Last();
-            Assert.AreEqual(groupModel.CreationDate, addedBan.CreationDate, "Elements' dates from beginning are not equal");
-            Assert.AreEqual(groupModel.FlowId, addedBan.FlowId, "Elements' dates to end are not equal");
+            Assert.AreEqual(expectedCount, context.Bans.Count(), "The element was not added");
+            var addedBans = context.Bans.Last();
+            Assert.AreEqual(groupModel.CreationDate, addedBans.CreationDate, "Elements' dates from beginning are not equal");
+            Assert.AreEqual(groupModel.FlowId, addedBans.FlowId, "Elements' dates to end are not equal");
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace UnitTests.BLLTests
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
             var service = new GroupService(context, _mapper);
             GroupModel groupModel = null;
-            var expectedCount = context.Groups.Count() + 1;
+            var expectedCount = context.Bans.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddAsync(groupModel),
@@ -108,48 +108,13 @@ namespace UnitTests.BLLTests
             var groupModel = new GroupModel()
             {
                 CreationDate = DateTime.Now.AddDays(2),
-                FlowId = null
+                FlowId = -5
         };
-            var expectedCount = context.Groups.Count() + 1;
+            var expectedCount = context.Bans.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddAsync(groupModel),
                 "Method does not throw an ArgumentNullException if ban's admin id is null");
-        }
-
-        public void AddAsync_EmptyAdminId_ThrowsArgumentNullException()
-        {
-            // Arrange
-            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            var service = new GroupService(context, _mapper);
-            var groupModel = new GroupModel()
-            {
-                CreationDate = DateTime.Now.AddDays(2),
-                FlowId = ''
-            };
-            var expectedCount = context.Groups.Count() + 1;
-
-            // Act & Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddAsync(groupModel),
-                "Method does not throw an ArgumentNullException if ban's admin id is empty");
-        }
-
-        [Test]
-        public void AddAsync_NotFoundUserId_ThrowsArgumentNullException()
-        {
-            // Arrange
-            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            var service = new GroupService(context, _mapper);
-            var groupModel = new GroupModel()
-            {
-                CreationDate = DateTime.Now.AddDays(2),
-                FlowId = "kopei"
-            };
-            var expectedCount = context.Groups.Count() + 1;
-
-            // Act & Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.AddAsync(groupModel),
-                "Method does not throw an ArgumentNullException if ban's user id is not found");
         }
 
         [Test]
@@ -163,7 +128,7 @@ namespace UnitTests.BLLTests
                 CreationDate = DateTime.Now.AddDays(2),
                 FlowId = Int32.Parse(context.Users.FirstOrDefault(user => user.Email == "pivo@gmail.com").Id)
             };
-            var expectedCount = context.Groups.Count() + 1;
+            var expectedCount = context.Bans.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.AddAsync(groupModel),
@@ -181,7 +146,7 @@ namespace UnitTests.BLLTests
                 CreationDate = DateTime.Now.AddDays(-24),
                 FlowId = Int32.Parse(context.Users.FirstOrDefault(user => user.Email == "pivo@gmail.com").Id)
             };
-            var expectedCount = context.Groups.Count() + 1;
+            var expectedCount = context.Bans.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.AddAsync(groupModel),
@@ -189,7 +154,7 @@ namespace UnitTests.BLLTests
         }
 
 
-        public async Task UpdateAsync_ValidBan_AddsElement()
+        public async Task UpdateAsync_ValidBans_AddsElement()
         {
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
@@ -199,16 +164,16 @@ namespace UnitTests.BLLTests
                 CreationDate = DateTime.Now.AddDays(36),
                 FlowId = Int32.Parse(context.Users.FirstOrDefault(user => user.Email == "pivo@gmail.com").Id)
             };
-            var expectedCount = context.Groups.Count() + 1;
+            var expectedCount = context.Bans.Count() + 1;
 
             // Act
             await service.UpdateAsync(groupModel);
 
             // Assert
-            Assert.AreEqual(expectedCount, context.Groups.Count(), "The element was not added");
-            var addedBan = context.Groups.Last();
-            Assert.AreEqual(groupModel.CreationDate, addedBan.CreationDate, "Elements' dates from beginning are not equal");
-            Assert.AreEqual(groupModel.FlowId, addedBan.FlowId, "Elements' dates to end are not equal");
+            Assert.AreEqual(expectedCount, context.Bans.Count(), "The element was not added");
+            var addedBans = context.Bans.Last();
+            Assert.AreEqual(groupModel.CreationDate, addedBans.CreationDate, "Elements' dates from beginning are not equal");
+            Assert.AreEqual(groupModel.FlowId, addedBans.FlowId, "Elements' dates to end are not equal");
         }
 
         [Test]
@@ -218,7 +183,7 @@ namespace UnitTests.BLLTests
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
             var service = new GroupService(context, _mapper);
             GroupModel groupModel = null;
-            var expectedCount = context.Groups.Count() + 1;
+            var expectedCount = context.Bans.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.UpdateAsync(groupModel),
@@ -234,48 +199,13 @@ namespace UnitTests.BLLTests
             var groupModel = new GroupModel()
             {
                 CreationDate = DateTime.Now.AddDays(2),
-                FlowId = null
+                FlowId = -5
             };
-            var expectedCount = context.Groups.Count() + 1;
+            var expectedCount = context.Bans.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.UpdateAsync(groupModel),
                 "Method does not throw an ArgumentNullException if ban's admin id is null");
-        }
-
-        public void UpdateAsync_EmptyAdminId_ThrowsArgumentNullException()
-        {
-            // Arrange
-            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            var service = new GroupService(context, _mapper);
-            var groupModel = new GroupModel()
-            {
-                CreationDate = DateTime.Now.AddDays(2),
-                FlowId = ''
-            };
-            var expectedCount = context.Groups.Count() + 1;
-
-            // Act & Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.UpdateAsync(groupModel),
-                "Method does not throw an ArgumentNullException if ban's admin id is empty");
-        }
-
-        [Test]
-        public void UpdateAsync_NotFoundAdminId_ThrowsArgumentNullException()
-        {
-            // Arrange
-            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            var service = new GroupService(context, _mapper);
-            var groupModel = new GroupModel()
-            {
-                CreationDate = DateTime.Now.AddDays(2),
-                FlowId = "kopei"
-            };
-            var expectedCount = context.Groups.Count() + 1;
-
-            // Act & Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.UpdateAsync(groupModel),
-                "Method does not throw an ArgumentNullException if ban's admin id is not found");
         }
 
         [Test]
@@ -289,7 +219,7 @@ namespace UnitTests.BLLTests
                 CreationDate = DateTime.Now.AddDays(2),
                 FlowId = Int32.Parse(context.Users.FirstOrDefault(user => user.Email == "pivo@gmail.com").Id)
             };
-            var expectedCount = context.Groups.Count() + 1;
+            var expectedCount = context.Bans.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.UpdateAsync(groupModel),
@@ -308,7 +238,7 @@ namespace UnitTests.BLLTests
                 FlowId = Int32.Parse(context.Users.FirstOrDefault(user => user.Email == "pivo@gmail.com").Id)
 
             };
-            var expectedCount = context.Groups.Count() + 1;
+            var expectedCount = context.Bans.Count() + 1;
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentException>(async () => await service.UpdateAsync(groupModel),
@@ -323,11 +253,11 @@ namespace UnitTests.BLLTests
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
             var service = new GroupService(context, _mapper);
-            var expectedCount = context.Groups.Count() - 1;
+            var expectedCount = context.Bans.Count() - 1;
 
             // Act
             await service.DeleteByIdAsync(id);
-            var actual = context.Groups;
+            var actual = context.Bans;
 
             // Assert
             Assert.AreEqual(expectedCount, actual.Count(), "The element was not deleted");
@@ -350,9 +280,9 @@ namespace UnitTests.BLLTests
 
         /*private static void AddDataForSpecificTests(ApplicationContext context)
         {
-            context.Groups.Add(new Group() { Number = 5, CreationDate = new DateTime(2025, 11, 15), Flow = new Flow("name", "ms", new DateTime(2025, 11, 1)), User = context.Users.FirstOrDefault(user => user.Email == "SSS@gmail.com") });
+            context.Bans.Add(new Group() { Number = 5, CreationDate = new DateTime(2025, 11, 15), Flow = new Flow("name", "ms", new DateTime(2025, 11, 1)), User = context.Users.FirstOrDefault(user => user.Email == "SSS@gmail.com") });
             context.SaveChanges();
-            context.Groups.Add(new Ban() { DateFrom = new DateTime(2021, 10, 20), DateTo = new DateTime(2025, 12, 20), Hammer = "Ban hammer 4", Admin = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), User = context.Users.FirstOrDefault(user => user.Email == "petrenko3@gmail.com") });
+            context.Bans.Add(new Bans() { DateFrom = new DateTime(2021, 10, 20), DateTo = new DateTime(2025, 12, 20), Hammer = "Bans hammer 4", Admin = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com"), User = context.Users.FirstOrDefault(user => user.Email == "petrenko3@gmail.com") });
             context.SaveChanges();
         }*/
     }
