@@ -25,10 +25,12 @@ namespace BLL.Services
 
         public async Task AddAsync(GroupModel model)
         {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
             if (model.Number < 0 && model.Number >= 10)
                 throw new ArgumentNullException(nameof(model), "Number of group < 0 or >=10");
             model.CreationDate = DateTime.Now;
-            if(await _context.Flows.FindAsync(model.FlowId) is null)
+            if (await _context.Flows.FindAsync(model.FlowId) is null)
                 throw new ArgumentNullException(nameof(model), "Flow with such an id was not found");
 
             await _context.Groups.AddAsync(_mapper.Map<Group>(model));
@@ -53,12 +55,12 @@ namespace BLL.Services
 
         public async Task UpdateAsync(GroupModel model)
         {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
             if (model.Number < 0 && model.Number >= 10)
                 throw new ArgumentNullException(nameof(model), "Number of group < 0 or >=10");
             if (await _context.Flows.FindAsync(model.FlowId) is null)
                 throw new ArgumentNullException(nameof(model), "Flow with such an id was not found");
-            if (model is null)
-                throw new ArgumentNullException(nameof(model), "Model cannot be null");
             var existingModel = await _context.Groups.FindAsync(model.Id);
             existingModel = _mapper.Map(model, existingModel);
             _context.Groups.Update(existingModel);
