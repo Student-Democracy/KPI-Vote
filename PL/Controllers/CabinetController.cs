@@ -37,6 +37,8 @@ namespace PL.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (!User.Identity.IsAuthenticated)
+                return RedirectToAction("Login", "Account");
             var user = await _userManager.GetUserAsync(User);
             var group = await _groupService.GetByIdAsync(user.GroupId);
             var flow = await _flowService.GetByIdAsync(group.FlowId);
