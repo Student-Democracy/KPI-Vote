@@ -69,7 +69,13 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Model's user id cannot be null or empty");
             if (await _context.Users.FindAsync(model.UserId) is null)
                 throw new ArgumentNullException(nameof(model), "Author with such an id was not found");
-            _context.Appeals.Update(_mapper.Map<Appeal>(model));
+            var existingModel = await _context.Appeals.FindAsync(model.Id);
+            if (!(existingModel is null) && model.Date != existingModel.Date)
+                throw new ArgumentException("The creation date cannot be changed", nameof(model));
+            if (!(existingModel is null) && model.UserId != existingModel.UserId)
+                throw new ArgumentException("Author cannot be changed", nameof(model));
+            existingModel = _mapper.Map(model, existingModel);
+            _context.Appeals.Update(existingModel);
             await _context.SaveChangesAsync();
         }
 
@@ -80,6 +86,7 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(userId), "No such a user");
             var appeals = await _context.Appeals
                 .Where(a => a.UserId == userId)
+                .OrderByDescending(a=>a.Date)
                 .ToListAsync();
             return _mapper.Map<IEnumerable<AppealModel>>(appeals);
         }
