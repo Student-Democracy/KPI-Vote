@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - KPI Vote</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/css/style.css" />
+    @RenderSection("Styles", false)
+</head>
+<body>
+    <header>
+        <div class="header-info">
+            <div class="logo">
+                <a asp-area="" asp-controller="Home" asp-action="Index"><img src="~/KPICoatOfArms.png" alt="KPI's coat of arms"></a>
+            </div>
+            <div class="name">
+                <a asp-area="" asp-controller="Home" asp-action="Index"><h1>KPI Vote</h1></a>
+            </div>
+        </div>
+        <nav class="header-nav">
+            <div class="nav-item">
+                <a asp-area="" asp-controller="Votings" asp-action="Index">Голосування</a>
+            </div>
+            <div class="nav-item">
+                <a asp-area="" asp-controller="Home" asp-action="About">Про нас</a>
+            </div>
+            <div class="nav-item">
+                <a asp-area="" asp-controller="Users" asp-action="Index">Користувачі</a>
+            </div>
+            <div class="nav-item">
+                <a asp-area="" asp-controller="Account" asp-action="Login">Профіль</a>
+            </div>
+        </nav>
+    </header>
+    <div class="delimiter"></div>
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+    <div class="delimiter reversed"></div>
+    <footer class="border-top footer text-muted">
+        <p>2021 © Всі права захищено. Розробка сайту: команда Student Democracy</p>
+        <p>Open-source проект "KPI Vote" на <a href="https://github.com/Student-Democracy/KPI-Vote">GitHub</a></p>
+        <p><a asp-area="" asp-controller="Appeals" asp-action="Index">Зв'язок з адміністрацією сайту</a></p>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

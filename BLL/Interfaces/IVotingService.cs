@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BLL.Interfaces
 {
-    interface IVotingService : ICRUD<VotingModel>
+    public interface IVotingService : ICRUD<VotingModel>
     {
         Task<IEnumerable<VotingModel>> GetFilteredAndSortedForUserAsync(string userId);
 

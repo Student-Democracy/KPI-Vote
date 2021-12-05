@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace BLL.Interfaces
 {
-    interface IGroupService : ICRUD<GroupModel>
+    public interface IGroupService : ICRUD<GroupModel>
     {
        
     }

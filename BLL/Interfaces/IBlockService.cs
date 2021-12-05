@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BLL.Interfaces
 {
-    interface IBlockService : ICRUD<BlockModel>
+    public interface IBlockService : ICRUD<BlockModel>
     {
         Task<IEnumerable<BlockModel>> GetSortedActiveBlocksAsync();  //active blocks mean that a ban is still continues
 

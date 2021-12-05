@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BLL.Interfaces
 {
-    interface IFlowService : ICRUD<FlowModel>
+    public interface IFlowService : ICRUD<FlowModel>
     {
 
     }

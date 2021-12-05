@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BLL.Interfaces
 {
-    interface IFacultyService : ICRUD<FacultyModel>
+    public interface IFacultyService : ICRUD<FacultyModel>
     {
 
     }
