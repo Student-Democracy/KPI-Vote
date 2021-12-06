@@ -21,6 +21,8 @@ namespace PL.Models
 
         public string Faculty { get; set; }
 
+        public IEnumerable<string> Roles;
+
         public ICollection<VotingReducedViewModel> Votings { get; set; }
     }
 }

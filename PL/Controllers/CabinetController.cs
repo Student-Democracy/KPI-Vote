@@ -57,6 +57,7 @@ namespace PL.Controllers
                 TelegramTag = user.TelegramTag,
                 Faculty = faculty.Name,
                 Group = groupName,
+                //Roles = Добавить!!!
                 //Votings = Добавить!!!
             };
             return View(profile);
