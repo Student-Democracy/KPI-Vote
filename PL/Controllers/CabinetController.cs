@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using DAL.Entities;
 using PL.Models;
 using BLL.Services;
+using BLL.Interfaces;
 
 namespace PL.Controllers
 {
@@ -18,15 +19,15 @@ namespace PL.Controllers
     {
         private readonly UserManager<User> _userManager;
 
-        private readonly GroupService _groupService;
+        private readonly IGroupService _groupService;
 
-        private readonly FlowService _flowService;
+        private readonly IFlowService _flowService;
 
-        private readonly FacultyService _facultyService;
+        private readonly IFacultyService _facultyService;
 
-        private readonly VotingService _votingService;
+        private readonly IVotingService _votingService;
 
-        public CabinetController(UserManager<User> userManager, GroupService groupService, FlowService flowService, FacultyService facultyService, VotingService votingService)
+        public CabinetController(UserManager<User> userManager, IGroupService groupService, IFlowService flowService, IFacultyService facultyService, IVotingService votingService)
         {
             _userManager = userManager;
             _groupService = groupService;

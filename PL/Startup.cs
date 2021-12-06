@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using BLL;
+using PL.Data;
 
 namespace PL
 {
@@ -36,7 +37,10 @@ namespace PL
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<User, IdentityRole>()
+            services.AddIdentity<User, IdentityRole>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            })
                 .AddEntityFrameworkStores<ApplicationContext>();
 
             services.AddAutoMapper(typeof(AutoMapperProfile));
@@ -76,6 +80,23 @@ namespace PL
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            // Seed data
+            using var serviceScope = app.ApplicationServices.CreateScope();
+            var seeder = new DataSeeder()
+            {
+                RoleManager = serviceScope.ServiceProvider.GetService<RoleManager<IdentityRole>>(),
+                UserManager = serviceScope.ServiceProvider.GetService<UserManager<User>>(),
+                AppealService = serviceScope.ServiceProvider.GetService<IAppealService>(),
+                BlockService = serviceScope.ServiceProvider.GetService<IBlockService>(),
+                FacultyService = serviceScope.ServiceProvider.GetService<IFacultyService>(),
+                FlowService = serviceScope.ServiceProvider.GetService<IFlowService>(),
+                GroupService = serviceScope.ServiceProvider.GetService<IGroupService>(),
+                VotingService = serviceScope.ServiceProvider.GetService<IVotingService>(),
+                VoteService = serviceScope.ServiceProvider.GetService<IVoteService>(),
+            };
+            seeder.SeedRoles().Wait();
+            seeder.SeedData().Wait();
         }
     }
 }
