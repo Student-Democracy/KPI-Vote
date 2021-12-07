@@ -1,4 +1,5 @@
 ﻿using DAL.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -42,11 +43,19 @@ namespace PL.Controllers
             }
             return View(model);
         }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            return View();
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> LogoutConfirmed()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
         }
     }
 }
