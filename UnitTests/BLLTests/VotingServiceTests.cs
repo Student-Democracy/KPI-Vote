@@ -1254,43 +1254,5 @@ namespace UnitTests.BLLTests
             Assert.ThrowsAsync<ArgumentException>(async () => await service.IsVotingSuccessfulAsync(_mapper.Map<VotingModel>(voting)),
                 "Method does not throw an ArgumentException if the voting is not completed yet");
         }
-
-        [Test]
-        [TestCase(VotingStatus.NotConfirmed)]
-        [TestCase(VotingStatus.Denied)]
-        public void GetActualAttendancePercentageAsync_NotConfirmedVoting_ThrowsArgumentException(VotingStatus status)
-        {
-            // Arrange
-            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            var service = new VotingService(context, _mapper);
-            var votingId = 4;
-            var voting = context.Votings.Find(votingId);
-            voting.Status = status;
-            context.Votings.Update(voting);
-            context.SaveChanges();
-
-            // Act & Assert
-            Assert.ThrowsAsync<ArgumentException>(async () => await service.GetActualAttendancePercentageAsync(_mapper.Map<VotingModel>(voting)),
-                "Method does not throw an ArgumentException if the voting status is not \"Confirmed\"");
-        }
-
-        [Test]
-        [TestCase(VotingStatus.NotConfirmed)]
-        [TestCase(VotingStatus.Denied)]
-        public void GetActualForPercentageAsync_NotConfirmedVoting_ThrowsArgumentException(VotingStatus status)
-        {
-            // Arrange
-            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            var service = new VotingService(context, _mapper);
-            var votingId = 4;
-            var voting = context.Votings.Find(votingId);
-            voting.Status = status;
-            context.Votings.Update(voting);
-            context.SaveChanges();
-
-            // Act & Assert
-            Assert.ThrowsAsync<ArgumentException>(async () => await service.GetActualForPercentageAsync(_mapper.Map<VotingModel>(voting)),
-                "Method does not throw an ArgumentException if the voting status is not \"Confirmed\"");
-        }
     }
 }

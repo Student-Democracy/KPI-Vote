@@ -234,8 +234,6 @@ namespace BLL.Services
         {
             if (model is null)
                 throw new ArgumentNullException(nameof(model), "Model cannot be null");
-            if (model.Status != VotingStatus.Confirmed)
-                throw new ArgumentException("Voting should be confirmed", nameof(model));
             IEnumerable<User> total;
             var votes = await Task.Run(() => _context.Votes.Where(v => v.VotingId == model.Id));
             var notBannedUsers = await Task.Run(() => _context.Users
@@ -282,8 +280,6 @@ namespace BLL.Services
         {
             if (model is null)
                 throw new ArgumentNullException(nameof(model), "Model cannot be null");
-            if (model.Status != VotingStatus.Confirmed)
-                throw new ArgumentException("Voting should be confirmed", nameof(model));
             var votes = await Task.Run(() => _context.Votes.Where(v => v.VotingId == model.Id));
             var votersNumber = await Task.Run(() => votes.Count());
             var votersForNumber = await Task.Run(() => votes.Where(v => v.Result == VoteResult.For).Count());
@@ -354,6 +350,22 @@ namespace BLL.Services
                 level = "КПІ";
             }
             return level;
+        }
+
+        public async Task<int> GetVotersNumberAsync(VotingModel model)
+        {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
+            var votes = await Task.Run(() => _context.Votes.Where(v => v.VotingId == model.Id));
+            return await Task.Run(() => votes.Count());
+        }
+
+        public async Task<int> GetVotersForNumberAsync(VotingModel model)
+        {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
+            var votes = await Task.Run(() => _context.Votes.Where(v => v.VotingId == model.Id));
+            return await Task.Run(() => votes.Where(v => v.Result == VoteResult.For).Count());
         }
     }
 }

@@ -18,6 +18,15 @@ namespace PL.Models
 
         public decimal MinimalAttendancePercentage { get; set; }
 
+        public decimal ForPercentage { 
+            get {
+                if (VotesTotally != 0)
+                    return (decimal)VotesFor / VotesTotally;
+                else
+                    return 0m;
+            }
+        }
+
         public decimal AttendancePercentage { get; set; }
 
         public DateTime CreationDate { get; set; }
