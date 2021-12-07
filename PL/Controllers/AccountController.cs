@@ -51,6 +51,7 @@ namespace PL.Controllers
             return View();
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> LogoutConfirmed()
         {
