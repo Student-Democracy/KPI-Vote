@@ -15,7 +15,7 @@ using BLL.Interfaces;
 namespace PL.Controllers
 {
     [Authorize]
-    public class CabinetController : Controller
+    public class CabinetController : BaseController
     {
         private readonly UserManager<User> _userManager;
 
@@ -51,7 +51,17 @@ namespace PL.Controllers
             var groupName = flow.Name + group.Number;
             if (!(flow.Postfix is null))
                 groupName += flow.Postfix;
-            var votings = await _votingService.GetUserVotingsAsync(user.Id);
+            var votings = (await _votingService.GetUserVotingsAsync(UserId))
+                .Select(async m => new VotingReducedViewModel()
+                {
+                    CreationDate = m.CreationDate,
+                    ForPercentage = await _votingService.GetActualForPercentageAsync(m) * 100,
+                    Id = m.Id,
+                    Status = await _votingService.GetVotingStatusAsync(m),
+                    IsSuccessfulNow = await _votingService.IsVotingSuccessfulNowAsync(m),
+                    Name = m.Name,
+                    Level = await _votingService.GetVotingLevelAsync(m)
+                }).Select(t => t.Result); ;
             var profile = new UserProfileViewModel()
             {
                 Name = name,
@@ -60,7 +70,7 @@ namespace PL.Controllers
                 Faculty = faculty.Name,
                 Group = groupName,
                 Roles = await _userManager.GetRolesAsync(user),
-                //Votings = Добавить!!!
+                Votings = votings
             };
             return View(profile);
         }

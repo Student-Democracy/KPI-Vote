@@ -95,3 +95,7 @@ td:nth-child(even) {
         background-color: darkred !important;
     }
 }
+
+.votings {
+    width: 80%;
+}

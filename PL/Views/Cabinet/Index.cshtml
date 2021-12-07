@@ -6,6 +6,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/cabinet.css" />
+    <link rel="stylesheet" href="~/css/voting.css" />
 }
 
 <h2>Особистий кабінет</h2>
@@ -47,8 +48,39 @@
     </tr>
 </table>
 <div class="btns-container">
-    <a  asp-area="" asp-controller="Cabinet" asp-action="ChangeEmail">Змінити електронну пошту</a>
-    <a  asp-area="" asp-controller="Cabinet" asp-action="ChangePassword">Змінити пароль</a>
+    <a asp-area="" asp-controller="Cabinet" asp-action="ChangeEmail">Змінити електронну пошту</a>
+    <a asp-area="" asp-controller="Cabinet" asp-action="ChangePassword">Змінити пароль</a>
     <a class="red" asp-area="" asp-controller="Account" asp-action="Logout">Вийти</a>
 </div>
 <br>
+<h2>Ваші голосування:</h2>
+<br />
+<div class="votings">
+    @foreach (var voting in @Model.Votings)
+    {
+            var globalColor = "#1a68a6";
+            if (voting.Status == "відмовлено")
+                globalColor = "black";
+            else if (voting.Status == "заявка")
+                globalColor = "orange";
+            else if (voting.Status == "завершено; успішне")
+                globalColor = "green";
+            else if (voting.Status == "завершено; неуспішне")
+                globalColor = "red";
+        <div style="border-color: @globalColor;" class="voting-reduced">
+            <div class="voting-reduced-left">
+                <a href="/Votings/@voting.Id"><h3>@voting.Name</h3></a>
+                <p>Зареєстровано: @voting.CreationDate</p>
+                <p>Рівень: @voting.Level</p>
+            </div>
+            <div class="voting-reduced-right">
+                @{
+                    var percentageColor = (voting.IsSuccessfulNow) ? "green" : "red";
+                }
+                <h3 style="color: @percentageColor;">@string.Format("{0:0.0}", voting.ForPercentage)%</h3>
+                <p>Статус: @voting.Status</p>
+            </div>
+        </div>
+
+    }
+</div>

@@ -19,6 +19,6 @@ namespace PL.Models
 
         public IEnumerable<string> Roles;
 
-        public ICollection<VotingReducedViewModel> Votings { get; set; }
+        public IEnumerable<VotingReducedViewModel> Votings { get; set; }
     }
 }
