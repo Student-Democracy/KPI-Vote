@@ -38,7 +38,7 @@ namespace PL.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Wrong e-mail and(or) password");
+                    ModelState.AddModelError("LoginError", "Неправильна електронна пошта та/або пароль");
                 }
             }
             return View(model);
