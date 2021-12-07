@@ -42,7 +42,7 @@ namespace PL.Controllers
             if (!User.Identity.IsAuthenticated)
                 return RedirectToAction("Login", "Account");
             var user = await _userManager.GetUserAsync(User);
-            var name = user.FirstName + " " + user.LastName;
+            var name = user.LastName + " " + user.FirstName;
             if (!(user.Patronymic is null))
                 name += " " + user.Patronymic;
             var group = await _groupService.GetByIdAsync(user.GroupId);
