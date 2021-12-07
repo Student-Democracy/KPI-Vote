@@ -41,6 +41,9 @@ namespace PL.Controllers
             if (!User.Identity.IsAuthenticated)
                 return RedirectToAction("Login", "Account");
             var user = await _userManager.GetUserAsync(User);
+            var name = user.FirstName + " " + user.LastName;
+            if (!(user.Patronymic is null))
+                name += " " + user.Patronymic;
             var group = await _groupService.GetByIdAsync(user.GroupId);
             var flow = await _flowService.GetByIdAsync(group.FlowId);
             var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
@@ -50,14 +53,12 @@ namespace PL.Controllers
             var votings = await _votingService.GetUserVotingsAsync(user.Id);
             var profile = new UserProfileViewModel()
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Patronymic = user.Patronymic,
+                Name = name,
                 Email = user.Email,
                 TelegramTag = user.TelegramTag,
                 Faculty = faculty.Name,
                 Group = groupName,
-                //Roles = Добавить!!!
+                Roles = await _userManager.GetRolesAsync(user),
                 //Votings = Добавить!!!
             };
             return View(profile);
