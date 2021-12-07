@@ -1,5 +1,14 @@
 main {
-    text-align: left;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+table {
+    width: 50%;
 }
 
 main h1, h2, h3, h4, h5, h6{
@@ -15,7 +24,7 @@ table {
 }
 
 td:nth-child(odd) {
-    width: 20%;
+    width: 50%;
 }
 
 td:nth-child(even) {
@@ -60,6 +69,10 @@ td:nth-child(even) {
 }
 
 @media (max-width: 650px) {
+    table {
+        width: 90%;
+    }
+
     .btns-container>a {
         width: 90%;
     }

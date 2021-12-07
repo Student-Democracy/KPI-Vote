@@ -50,6 +50,15 @@ namespace PL.Data
 
         public async Task SeedData()
         {
+            var roles = new string[]
+                {
+                    "Адміністратор",
+                    "Голова СР КПІ",
+                    "Голова СР Факультету",
+                    "Староста потоку",
+                    "Староста групи",
+                    "Студент"
+                };
             var faculties = new FacultyModel[]
             {
                 new FacultyModel() { Name = "ФІОТ", CreationDate = new DateTime(2021, 11, 14) },
@@ -123,15 +132,23 @@ namespace PL.Data
             };
             if (!(UserManager is null))
             {
+                int count = 0;
                 foreach (var user in users)
                 {
-                    if (await UserManager.FindByEmailAsync(user.Email) is null)
+                    User newUser = await UserManager.FindByEmailAsync(user.Email);
+                    if (newUser is null)
                     {
                         user.UserName = user.Email;
                         user.PasswordHash = null;
                         await UserManager.CreateAsync(user, "P@$$w0rd");
-                        await UserManager.AddToRoleAsync(await UserManager.FindByEmailAsync(user.Email), "Студент");
+                        newUser = await UserManager.FindByEmailAsync(user.Email);
+                        await UserManager.AddToRoleAsync(newUser, "Студент");
                     }
+                    if (count <= 4 && !await UserManager.IsInRoleAsync(newUser, roles[count]))
+                    {
+                        await UserManager.AddToRoleAsync(newUser, roles[count]);
+                    }
+                    count++;
                 }
             }
         }
