@@ -151,6 +151,58 @@ namespace PL.Data
                     count++;
                 }
             }
+            var bans = new BlockModel[]
+            {
+                new BlockModel() { DateTo = DateTime.Now.AddDays(2), Hammer = "Ban hammer 1", AdminId = (await UserManager.FindByEmailAsync("petrenko1@gmail.com")).Id, UserId = (await UserManager.FindByEmailAsync("pivo@gmail.com")).Id },
+                new BlockModel() { DateTo = DateTime.Now.AddDays(15), Hammer = "Ban hammer 2", AdminId = (await UserManager.FindByEmailAsync("petrenko1@gmail.com")).Id, UserId = (await UserManager.FindByEmailAsync("ivanov@gmail.com")).Id }
+            };
+            if (!(BlockService is null) && !BlockService.GetAll().Any())
+            {
+                foreach (var ban in bans)
+                {
+                    await BlockService.AddAsync(ban);
+                }
+            }
+            var appeals = new AppealModel[]
+            {
+                new AppealModel() { Date = new DateTime(2021, 11, 14), UserId = (await UserManager.FindByEmailAsync("pivo@gmail.com")).Id, Message = "Message sample", Importance = 3 },
+                new AppealModel() { Date = new DateTime(2021, 11, 14), AdminId = (await UserManager.FindByEmailAsync("petrenko1@gmail.com")).Id, UserId = (await UserManager.FindByEmailAsync("pivo@gmail.com")).Id, Message = "Hello", Response = "World", Importance = 1 }
+            };
+            if (!(AppealService is null) && !AppealService.GetAll().Any())
+            {
+                foreach (var appeal in appeals)
+                {
+                    await AppealService.AddAsync(appeal);
+                }
+            }
+            var votings = new VotingModel[]
+            {
+                new VotingModel() { Name = "Voting 1",
+                    Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tempor dictum lacus, id fringilla ex ornare nec. Maecenas mollis ex in odio aliquam placerat. Morbi eu lobortis enim, at luctus mauris. Vivamus tincidunt euismod commodo. Etiam hendrerit finibus justo, vel imperdiet lectus accumsan eget. Ut sem dolor, efficitur ut odio sed, aliquam condimentum dui. Nam suscipit laoreet est at ligula.", AuthorId = (await UserManager.FindByEmailAsync("petrenko1@gmail.com")).Id, StatusSetterId = (await UserManager.FindByEmailAsync("petrenko1@gmail.com")).Id, CompletionDate = DateTime.Now.AddDays(100), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed },
+                new VotingModel() { Name = "Voting 2", Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tempor dictum lacus, id fringilla ex ornare nec. Maecenas mollis ex in odio aliquam placerat. Morbi eu lobortis enim, at luctus mauris. Vivamus tincidunt euismod commodo. Etiam hendrerit finibus justo, vel imperdiet lectus accumsan eget. Ut sem dolor, efficitur ut odio sed, aliquam condimentum dui. Nam suscipit laoreet est at ligula.", AuthorId = (await UserManager.FindByEmailAsync("sydorenko@gmail.com")).Id, StatusSetterId = (await UserManager.FindByEmailAsync("petrenko1@gmail.com")).Id, CompletionDate = DateTime.Now.AddDays(30), VisibilityTerm = 30, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed, FacultyId = 1},
+                new VotingModel() { Name = "Voting 3", Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tempor dictum lacus, id fringilla ex ornare nec. Maecenas mollis ex in odio aliquam placerat. Morbi eu lobortis enim, at luctus mauris. Vivamus tincidunt euismod commodo. Etiam hendrerit finibus justo, vel imperdiet lectus accumsan eget. Ut sem dolor, efficitur ut odio sed, aliquam condimentum dui. Nam suscipit laoreet est at ligula.", AuthorId = (await UserManager.FindByEmailAsync("sydorenko@gmail.com")).Id, StatusSetterId = (await UserManager.FindByEmailAsync("petrenko1@gmail.com")).Id, CompletionDate = DateTime.Now.AddDays(2), VisibilityTerm = 1, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed, FlowId = 2 },
+                new VotingModel() { Name = "Voting 4", Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tempor dictum lacus, id fringilla ex ornare nec. Maecenas mollis ex in odio aliquam placerat. Morbi eu lobortis enim, at luctus mauris. Vivamus tincidunt euismod commodo. Etiam hendrerit finibus justo, vel imperdiet lectus accumsan eget. Ut sem dolor, efficitur ut odio sed, aliquam condimentum dui. Nam suscipit laoreet est at ligula.", AuthorId = (await UserManager.FindByEmailAsync("sydorenko@gmail.com")).Id, StatusSetterId = (await UserManager.FindByEmailAsync("petrenko1@gmail.com")).Id, CompletionDate = DateTime.Now.AddDays(5), VisibilityTerm = 5, MinimalForPercentage = 55M, MinimalAttendancePercentage = 10.5m, Status = VotingStatus.Confirmed, GroupId = 5 }
+            };
+            if (!(VotingService is null) && !VotingService.GetAll().Any())
+            {
+                foreach (var voting in votings)
+                {
+                    await VotingService.AddAsync(voting);
+                }
+            }
+            var votes = new VoteModel[]
+            {
+                new VoteModel() { Result = VoteResult.For, VotingId = 1, UserId = (await UserManager.FindByEmailAsync("petrenko1@gmail.com")).Id },
+                new VoteModel() { Result = VoteResult.Against, VotingId = 1, UserId = (await UserManager.FindByEmailAsync("sydorenko@gmail.com")).Id },
+                new VoteModel() { Result = VoteResult.Neutral, VotingId = 2, UserId = (await UserManager.FindByEmailAsync("petrenko1@gmail.com")).Id }
+            };
+            if (!(VoteService is null) && !VoteService.GetAll().Any())
+            {
+                foreach (var vote in votes)
+                {
+                    await VoteService.AddAsync(vote);
+                }
+            }
         }
     }
 }
