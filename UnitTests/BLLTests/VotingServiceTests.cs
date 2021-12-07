@@ -877,37 +877,6 @@ namespace UnitTests.BLLTests
         }
 
         [Test]
-        public async Task GetFilteredAndSortedForUserAsync_ValidUserId_ReturnsRightData()
-        {
-            // Arrange
-            using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
-            AddDataForSpecificTests(context);
-            var service = new VotingService(context, _mapper);
-            var user = context.Users.FirstOrDefault(u => u.Email == "petrenko1@gmail.com");
-            var expectedNames = new string[]
-            {
-                "Voting 8",
-                "Voting 4",
-                "Voting 7",
-                "Voting 3",
-                "Voting 6",
-                "Voting 2",
-                "Voting 5",
-                "Voting 1"
-            };
-
-            // Act
-            var actualNames = (await service.GetFilteredAndSortedForUserAsync(user.Id)).Select(v => v.Name).ToArray();
-
-            // Assert
-            Assert.AreEqual(expectedNames.Length, actualNames.Length, "Arrays do not have the same Length");
-            for (int i = 0; i < expectedNames.Length; i++)
-            {
-                Assert.AreEqual(expectedNames[i], actualNames[i], "Votings are sorted in the wrong order");
-            }
-        }
-
-        [Test]
         [TestCase(null)]
         [TestCase("")]
         public void GetFilteredAndSortedForUserAsync_NullOrEmptyUserId_ThrowsArgumentNullException(string userId)

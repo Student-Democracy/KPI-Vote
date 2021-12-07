@@ -1,7 +1,11 @@
 ﻿using BLL.Interfaces;
+using BLL.Models;
 using BLL.Services;
+using DAL.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace PL.Controllers
 {
+    [Authorize]
     public class VotingsController : BaseController
     {
         private readonly IVotingService _votingService;
@@ -22,7 +27,17 @@ namespace PL.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var model = await _votingService.GetFilteredAndSortedForUserAsync(UserId);
+            IEnumerable<VotingReducedViewModel> model = (await _votingService.GetFilteredAndSortedForUserAsync(UserId))
+                .Select(async m => new VotingReducedViewModel()
+                {
+                    CreationDate = m.CreationDate,
+                    ForPercentage = await _votingService.GetActualForPercentageAsync(m) * 100,
+                    Id = m.Id,
+                    Status = await _votingService.GetVotingStatusAsync(m),
+                    IsSuccessfulNow = await _votingService.IsVotingSuccessfulNowAsync(m),
+                    Name = m.Name,
+                    Level = await _votingService.GetVotingLevelAsync(m)
+                }).Select(t => t.Result);
             return View(model);
         }
 

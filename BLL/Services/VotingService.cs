@@ -163,7 +163,7 @@ namespace BLL.Services
                 .Where(v => v.GroupId == group.Id)
                 .OrderByDescending(v => v.CreationDate)
                 .Concat(userVotings));                        // Group level
-            return _mapper.Map<IEnumerable<VotingModel>>(userVotings);
+            return _mapper.Map<IEnumerable<VotingModel>>(userVotings.OrderByDescending(v => v.CreationDate));
         }
 
         public async Task<IEnumerable<VotingModel>> GetFilteredAndSortedForAdminAsync()
@@ -300,6 +300,60 @@ namespace BLL.Services
                 .Include(v => v.Votes)
                 .OrderBy(v => v.CreationDate));
             return _mapper.Map<IEnumerable<VotingModel>>(votings);
+        }
+
+        public async Task<string> GetVotingStatusAsync(VotingModel model)
+        {
+            if (model.Status == VotingStatus.Denied)
+            {
+                return "відмовлено";
+            }
+            else if (model.Status == VotingStatus.NotConfirmed)
+            {
+                return "заявка";
+            }
+            else
+            {
+                if (model.CompletionDate.AddDays(model.VisibilityTerm) >= DateTime.Now)
+                    return "активно";
+                else
+                {
+                    var result = "завершено; ";
+                    if (await IsVotingSuccessfulAsync(model))
+                        result += "успішне";
+                    else
+                        result += "неуспішне";
+                    return result;
+                }
+            }
+        }
+
+        public async Task<string> GetVotingLevelAsync(VotingModel model)
+        {
+            string level = "";
+            if (!(model.GroupId is null))
+            {
+                var group = await _context.Groups.Include(x => x.Flow).SingleOrDefaultAsync(x => x.Id == model.GroupId);
+                level += "група " + group.Flow.Name + group.Number;
+                if (group.Flow.Postfix != null)
+                    level += group.Flow.Postfix;
+            }
+            else if (!(model.FlowId is null)) {
+                var flow = await _context.Flows.FindAsync(model.FlowId);
+                level += "потік " + flow.Name + "X";
+                if (flow.Postfix != null)
+                    level += flow.Postfix;
+            }
+            else if (!(model.FacultyId is null))
+            {
+                var faculty = await _context.Faculties.FindAsync(model.FacultyId);
+                level += faculty.Name;
+            }
+            else
+            {
+                level = "КПІ";
+            }
+            return level;
         }
     }
 }

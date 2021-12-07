@@ -7,3 +7,36 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/voting.css" />
 }
+
+<h2>Голосування</h2>
+<br>
+@foreach (var voting in @Model)
+{
+<div class="votings">
+    @{ 
+        var globalColor = "#1a68a6";
+        if (voting.Status == "відмовлено")
+            globalColor = "black";
+        else if (voting.Status == "заявка")
+            globalColor = "orange";
+        else if (voting.Status == "завершено; успішне")
+            globalColor = "green";
+        else if (voting.Status == "завершено; неуспішне")
+            globalColor = "red";
+    }
+    <div style="border-color: @globalColor;" class="voting-reduced">
+        <div class="voting-reduced-left">
+            <a href="/Votings/@voting.Id"><h3>@voting.Name</h3></a>
+            <p>Зареєстровано: @voting.CreationDate</p>
+            <p>Рівень: @voting.Level</p>
+        </div>
+        <div class="voting-reduced-right">
+            @{
+            var percentageColor = (voting.IsSuccessfulNow) ? "green" : "red" ;
+            }
+            <h3 style="color: @percentageColor;">@string.Format("{0:0.0}", voting.ForPercentage)</h3>
+            <p>Статус: @voting.Status</p>
+        </div>
+    </div>
+</div>
+}

@@ -26,5 +26,9 @@ namespace BLL.Interfaces
         Task<decimal> GetActualAttendancePercentageAsync(VotingModel model);
 
         Task<decimal> GetActualForPercentageAsync(VotingModel model);
+
+        Task<string> GetVotingStatusAsync(VotingModel model);
+
+        Task<string> GetVotingLevelAsync(VotingModel model);
     }
 }
