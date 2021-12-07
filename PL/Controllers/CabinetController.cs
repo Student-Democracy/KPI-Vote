@@ -36,6 +36,7 @@ namespace PL.Controllers
             _votingService = votingService;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             if (!User.Identity.IsAuthenticated)

@@ -1,0 +1,42 @@
+main h2 {
+    margin-bottom: 15px;
+}
+
+.votings {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.voting-reduced {
+    border-top: 3px solid #1a68a6;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    padding: 15px 15px;
+    gap: 10px;
+}
+
+.voting-reduced-left>p {
+    text-align: left;
+}
+
+.voting-reduced-left>a>h3 {
+    text-align: left;
+}
+
+.voting-reduced-right>p {
+    text-align: right;
+}
+
+.voting-reduced-right>h3 {
+    font-size: 24pt;
+    text-align: right;
+}
+
+.voting-reduced-right {
+    min-width: fit-content;
+}

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PL.Controllers
 {
-    public abstract class BaseController : ControllerBase
+    public abstract class BaseController : Controller
     {
         internal string UserId => !User.Identity.IsAuthenticated
             ? null

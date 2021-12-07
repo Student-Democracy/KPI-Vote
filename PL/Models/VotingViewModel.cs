@@ -8,6 +8,8 @@ namespace PL.Models
 {
     public class VotingViewModel
     {
+        public int Id { get; set; }
+
         public string Name { get; set; }
 
         public string Description { get; set; }
@@ -15,6 +17,8 @@ namespace PL.Models
         public decimal MinimalForPercentage { get; set; }
 
         public decimal MinimalAttendancePercentage { get; set; }
+
+        public decimal AttendancePercentage { get; set; }
 
         public DateTime CreationDate { get; set; }
 
@@ -27,11 +31,19 @@ namespace PL.Models
 
         public string Author { get; set; }
 
+        public string AuthorId { get; set; }
+
         public string StatusSetter { get; set; }
+
+        public string StatusSetterId { get; set; }
 
         public string Level { get; set; }
 
 
-        public ICollection<VoteViewModel> Votes { get; set; }
+        public int VotesFor { get; set; }
+
+        public int VotesTotally { get; set; }
+
+        public bool IsSuccessfulNow { get; set; }
     }
 }

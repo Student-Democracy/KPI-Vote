@@ -218,6 +218,13 @@ namespace BLL.Services
                 throw new ArgumentException("Voting should be confirmed", nameof(model));
             if (model.CompletionDate >= DateTime.Now)
                 throw new ArgumentException("Voting should be completed", nameof(model));
+            return await IsVotingSuccessfulNowAsync(model);
+        }
+
+        public async Task<bool> IsVotingSuccessfulNowAsync(VotingModel model)
+        {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model), "Model cannot be null");
             var success = await GetActualAttendancePercentageAsync(model) >= model.MinimalAttendancePercentage / 100.0m
                 && await GetActualForPercentageAsync(model) >= model.MinimalForPercentage / 100.0m;
             return success;
