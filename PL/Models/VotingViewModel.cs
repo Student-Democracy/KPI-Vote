@@ -21,7 +21,7 @@ namespace PL.Models
         public decimal ForPercentage { 
             get {
                 if (VotesTotally != 0)
-                    return (decimal)VotesFor / VotesTotally;
+                    return (decimal)VotesFor / VotesTotally * 100.0m;
                 else
                     return 0m;
             }
