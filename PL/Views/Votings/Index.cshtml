@@ -36,7 +36,7 @@
 </div>
 <br>
 <div class="create-voting">
-    <a asp-area="" asp-controller="Votings" asp-action="Create"><img src="~/smallicons/pen.png" class="small-icon">Запропонувати голосування</a>
+    <a asp-area="" asp-controller="Votings" asp-action="Create"><img src="~/smallicons/pen.png" class="small-icon" alt="pen icon">Запропонувати голосування</a>
 </div>
 <br>
 <div class="votings">
@@ -58,6 +58,25 @@
                 <p>Рівень: @voting.Level</p>
             </div>
             <div class="voting-reduced-right">
+                @if (voting.IsUserAbleToChangeStatus)
+                {
+                <div class="blocks small">
+                    @if (voting.Status == "заявка" || voting.Status == "відмовлено")
+                    {
+                    <form id="approve" method="POST" asp-controller="Votings" asp-action="Approve">
+                        <input type="hidden" name="id" value="@voting.Id">
+                        <button type="submit" class="block blue">Затвердити</button>
+                    </form>
+                    }
+                    @if (voting.Status != "відмовлено")
+                    {
+                <form id="block" method="POST" asp-controller="Votings" asp-action="Block">
+                    <input type="hidden" name="id" value="@voting.Id">
+                    <button type="submit" class="block gray">Заблокувати</button>
+                </form>
+                    }
+                </div>
+                }
                 @{
                     var percentageColor = (voting.IsSuccessfulNow) ? "green" : "red";
                 }

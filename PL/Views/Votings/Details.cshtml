@@ -35,6 +35,25 @@ else
                 <p>Перевірив: <a href="/Users/UserProfiles/@Model.StatusSetterId">@Model.StatusSetter</a></p>
             </div>
             <div class="voting-main-right">
+                @if (Model.IsUserAbleToChangeStatus)
+                {
+                    <div class="blocks">
+                        @if (Model.Status == "заявка" || Model.Status == "відмовлено")
+                        {
+                            <form id="approve" method="POST" asp-controller="Votings" asp-action="Approve">
+                                <input type="hidden" name="id" value="@Model.Id">
+                                <button type="submit" class="block blue">Затвердити</button>
+                            </form>
+                        }
+                        @if (Model.Status != "відмовлено")
+                        {
+                            <form id="block" method="POST" asp-controller="Votings" asp-action="Block">
+                                <input type="hidden" name="id" value="@Model.Id">
+                                <button type="submit" class="block gray">Заблокувати</button>
+                            </form>
+                        }
+                    </div>
+                }
                 @{
                     var percentageColor = (Model.IsSuccessfulNow) ? "green" : "red";
                 }

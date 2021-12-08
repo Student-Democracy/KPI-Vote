@@ -9,6 +9,8 @@ namespace PL.Models
 {
     public class VotingViewModel
     {
+        public int Id { get; set; }
+
         public string Name { get; set; }
 
         public string Description { get; set; }
@@ -58,5 +60,7 @@ namespace PL.Models
         public string UserVote { get; set; }
 
         public bool IsUserAbleToVote { get; set; }
+
+        public bool IsUserAbleToChangeStatus { get; set; }
     }
 }

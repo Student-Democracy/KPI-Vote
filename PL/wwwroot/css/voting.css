@@ -226,3 +226,70 @@ input {
         background-color: #023770;
       }
 }
+
+.block {
+    background-color: #1a68a6;
+    color: white !important;
+    font-weight: 600;
+    padding: 5px 8px;
+    border-radius: 10px;
+    text-align: center;
+    width: fit-content;
+    height: fit-content;
+    margin: 0 0;
+}
+
+.block:hover {
+    color: white !important;
+}
+
+.block:active {
+    color: white !important;
+}
+
+.blue:hover {
+    background-color: #023770;
+}
+
+.gray {
+    background-color: gray;
+}
+
+.gray:hover {
+    background-color: black;
+}
+
+.blocks {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: right;
+    height: fit-content;
+}
+
+.blocks>form>button {
+    font-size: 10pt;
+}
+
+.small>form>button {
+    font-size: 8pt;
+}
+
+@media (max-width: 650px) {
+    .blue:hover {
+        background-color: #1a68a6;
+    }
+    
+    .gray:hover {
+        background-color: gray;
+    }
+
+    .blue:active {
+        background-color: #023770;
+    }
+    
+    .gray:active {
+        background-color: black;
+    }
+}

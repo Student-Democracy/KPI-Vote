@@ -75,7 +75,8 @@ namespace PL.Controllers
                 Status = await _votingService.GetVotingStatusAsync(m),
                 IsSuccessfulNow = await _votingService.IsVotingSuccessfulNowAsync(m),
                 Name = m.Name,
-                Level = await _votingService.GetVotingLevelAsync(m)
+                Level = await _votingService.GetVotingLevelAsync(m),
+                IsUserAbleToChangeStatus = await IsUserAbleToChangeStatusAsync(m)
             }).Select(t => t.Result);
             return View(model);
         }
@@ -91,6 +92,7 @@ namespace PL.Controllers
             {
                 mappedModel = new VotingViewModel()
                 {
+                    Id = model.Id,
                     CreationDate = model.CreationDate,
                     CompletionDate = model.CompletionDate,
                     Status = await _votingService.GetVotingStatusAsync(model),
@@ -106,7 +108,8 @@ namespace PL.Controllers
                     VotesTotally = await _votingService.GetVotersNumberAsync(model),
                     AuthorId = model.AuthorId,
                     StatusSetterId = model.StatusSetterId,
-                    IsUserAbleToVote = await IsUserAbleToVoteAsync(model)
+                    IsUserAbleToVote = await IsUserAbleToVoteAsync(model),
+                    IsUserAbleToChangeStatus = await IsUserAbleToChangeStatusAsync(model)
                 };
                 var author = await _userManager.FindByIdAsync(mappedModel.AuthorId);
                 var statusSetter = await _userManager.FindByIdAsync(mappedModel.StatusSetterId);
@@ -222,11 +225,50 @@ namespace PL.Controllers
             return RedirectToAction("Details", new { id });
         }
 
+        [HttpPost]
+        [Route("Votings/Block")]
+        public async Task<IActionResult> Block(int id)
+        {
+            var refferer = Request.Headers["Referer"].ToString();
+            var voting = await _votingService.GetByIdAsync(id);
+            if (!(voting is null) && await IsUserAbleToChangeStatusAsync(voting))
+            {
+                voting.Status = VotingStatus.Denied;
+                voting.StatusSetterId = UserId;
+                await _votingService.ChangeStatusAsync(voting);
+            }
+            else
+            {
+                ModelState.AddModelError("StatusChangeError", "Ви не можете змінити статус цього голосування");
+            }
+            return Redirect(refferer);
+        }
+
+        [HttpPost]
+        [Route("Votings/Approve")]
+        public async Task<IActionResult> Approve(int id)
+        {
+            var refferer = Request.Headers["Referer"].ToString();
+            var voting = await _votingService.GetByIdAsync(id);
+            if (!(voting is null) && await IsUserAbleToChangeStatusAsync(voting))
+            {
+                voting.Status = VotingStatus.Confirmed;
+                voting.StatusSetterId = UserId;
+                await _votingService.ChangeStatusAsync(voting);
+            }
+            else
+            {
+                ModelState.AddModelError("StatusChangeError", "Ви не можете змінити статус цього голосування");
+            }
+            return Redirect(refferer);
+        }
+
         // GET: VotingsController/Create
         [HttpGet]
         [Route("Votings/Create")]
         public async Task<IActionResult> Create()
         {
+            var p = Request.Headers["Referer"].ToString();
             return View();
         }
 

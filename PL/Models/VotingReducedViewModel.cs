@@ -21,5 +21,7 @@ namespace PL.Models
         public string Level { get; set; }
 
         public decimal ForPercentage { get; set; }
+
+        public bool IsUserAbleToChangeStatus { get; set; }
     }
 }
