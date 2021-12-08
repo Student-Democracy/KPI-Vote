@@ -1,6 +1,7 @@
 ﻿using DAL.Entities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -53,7 +54,7 @@ namespace PL.Models
 
         public bool IsSuccessfulNow { get; set; }
 
-
-        public VoteViewModel UserVote { get; set; }
+        [Display(Name = "UserVote")]
+        public string UserVote { get; set; }
     }
 }

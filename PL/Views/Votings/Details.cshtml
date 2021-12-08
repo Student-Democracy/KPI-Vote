@@ -53,27 +53,32 @@ else
         <br>
         <div class="vote">
             <h4>Голосувати</h4>
+            <p>@Html.ValidationMessage("VoteError")</p>
             @if (!(Model.UserVote is null))
             {
                 var voteColor = "black";
-                if (Model.UserVote.Result == "ЗА")
+                if (Model.UserVote == "ЗА")
                     voteColor = "green";
-                else if (Model.UserVote.Result == "ПРОТИ")
+                else if (Model.UserVote == "ПРОТИ")
                     voteColor = "red";
-                <p>Ви проголосували: <span style="color: @voteColor;">@Model.UserVote.Result</span></p>
+                <p>Ви проголосували: <span style="color: @voteColor;">@Model.UserVote</span></p>
                 <p>Дякуємо!</p>
             }
-            else
+            else if (Model.Status == "активно")
             {
-                <form method="POST" asp-controller="Votings" asp-action="Vote">
-                    <input type="radio" id="FOR" name="vote-type" value="FOR" class="for">
+                <form method="POST" asp-route="Votings/{id}">
+                    <input type="radio" id="FOR" name="UserVote" value="ЗА" class="for">
                     <label for="FOR" class="for">ЗА</label><br>
-                    <input type="radio" id="AGAINST" name="vote-type" value="AGAINST" class="against">
+                    <input type="radio" id="AGAINST" name="UserVote" value="ПРОТИ" class="against">
                     <label for="AGAINST" class="against">ПРОТИ</label><br>
-                    <input type="radio" id="NEUTRAL" name="vote-type" value="NEUTRAL">
+                    <input type="radio" id="NEUTRAL" name="UserVote" value="Нейтрально" required>
                     <label for="NEUTRAL">Нейтрально</label><br>
                     <button type="submit">Проголосувати</button>
                 </form>
+            }
+            else
+            {
+                <p>На жаль, голосування не є активним, тому проголосувати не можна</p>
             }
         </div>
     </div>

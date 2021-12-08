@@ -50,6 +50,7 @@ namespace PL.Controllers
         }
 
         // GET: VotingsController/Details/5
+        [HttpGet]
         [Route("Votings/{id}")]
         public async Task<IActionResult> Details(int id)
         {
@@ -90,9 +91,9 @@ namespace PL.Controllers
                 {
                     mappedModel.UserVote = userVote.Result switch
                     {
-                        VoteResult.For => new VoteViewModel() { Result = "ЗА" },
-                        VoteResult.Against => new VoteViewModel() { Result = "ПРОТИ" },
-                        _ => new VoteViewModel() { Result = "Нейтрально" },
+                        VoteResult.For => "ЗА",
+                        VoteResult.Against => "ПРОТИ" ,
+                        _ => "Нейтрально"
                     };
                 }    
             }
@@ -101,6 +102,33 @@ namespace PL.Controllers
                 ModelState.AddModelError("VotingNotFoundError", "Такого голосування не знайдено");
             }
             return View(mappedModel);
+        }
+
+        [HttpPost]
+        [Route("Votings/{id}")]
+        public async Task<IActionResult> Vote(int id, VotingViewModel model)
+        {
+            try
+            {
+                var voteModel = new VoteModel() 
+                { 
+                    VotingId = id, 
+                    UserId = UserId,
+                    Result = model.UserVote switch
+                    {
+                        "ЗА" => VoteResult.For,
+                        "ПРОТИ" => VoteResult.Against,
+                        _ => VoteResult.Neutral
+                    }
+                    };
+                await _voteService.AddAsync(voteModel);
+
+            }
+            catch (Exception exc)
+            {
+                ModelState.AddModelError("VoteError", exc.Message);
+            }
+            return RedirectToAction("Details", new { id });
         }
 
         // GET: VotingsController/Create
