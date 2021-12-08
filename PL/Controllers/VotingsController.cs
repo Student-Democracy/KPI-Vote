@@ -42,19 +42,64 @@ namespace PL.Controllers
         // GET: VotingsController
         [HttpGet]
         [Route("Votings")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string votingstype)
         {
-            IEnumerable<VotingReducedViewModel> model = (await _votingService.GetFilteredAndSortedForUserAsync(UserId))
-                .Select(async m => new VotingReducedViewModel()
-                {
-                    CreationDate = m.CreationDate,
-                    ForPercentage = await _votingService.GetActualForPercentageAsync(m) * 100,
-                    Id = m.Id,
-                    Status = await _votingService.GetVotingStatusAsync(m),
-                    IsSuccessfulNow = await _votingService.IsVotingSuccessfulNowAsync(m),
-                    Name = m.Name,
-                    Level = await _votingService.GetVotingLevelAsync(m)
-                }).Select(t => t.Result);
+            var user = await _userManager.GetUserAsync(User);
+            if (votingstype is null)
+                return RedirectToAction("Index", new { votingstype = "actual" });
+            else if (votingstype == "all" && !await _userManager.IsInRoleAsync(user, "Адміністратор"))
+                return RedirectToAction("Index", new { votingstype = "actual" });
+            else if ((votingstype == "requests" || votingstype == "checked")
+                && !(await _userManager.IsInRoleAsync(user, "Адміністратор")
+                || await _userManager.IsInRoleAsync(user, "Голова СР КПІ")
+                || await _userManager.IsInRoleAsync(user, "Голова СР Факультету")
+                || await _userManager.IsInRoleAsync(user, "Староста потоку")
+                || await _userManager.IsInRoleAsync(user, "Староста групи")))
+                return RedirectToAction("Index", new { votingstype = "actual" });
+            ViewBag.votingstype = votingstype;
+            IEnumerable<VotingModel> tempModel = null;
+            switch (votingstype)
+            {
+                case "all":
+                    tempModel = await _votingService.GetFilteredAndSortedForAdminAsync();
+                    break;
+                case "requests":
+                    tempModel = await _votingService.GetNotConfirmedAsync();
+                    if (!await _userManager.IsInRoleAsync(user, "Адміністратор"))
+                    {
+                        var group = await _groupService.GetByIdAsync(user.GroupId);
+                        var flow = await _flowService.GetByIdAsync(group.FlowId);
+                        var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
+                        if (await _userManager.IsInRoleAsync(user, "Голова СР КПІ"))
+                            tempModel = tempModel.Where(v => !(v.FacultyId is null) || (v.FacultyId is null && v.FlowId is null && v.GroupId is null));
+                        else if (await _userManager.IsInRoleAsync(user, "Голова СР Факультету"))
+                            tempModel = tempModel.Where(v => v.FacultyId == faculty.Id || (!(v.FlowId is null) && _flowService.GetAll().Where(f => f.Id == v.FlowId).SingleOrDefault().FacultyId == faculty.Id));
+                        else if (await _userManager.IsInRoleAsync(user, "Староста потоку"))
+                            tempModel = tempModel.Where(v => v.FlowId == flow.Id || (!(v.GroupId is null) && _groupService.GetAll().Where(g => g.Id == v.GroupId).SingleOrDefault().FlowId == flow.Id));
+                        else if (await _userManager.IsInRoleAsync(user, "Староста групи"))
+                            tempModel = tempModel.Where(v => v.GroupId == group.Id);
+                    }
+                    break;
+                case "checked":
+                    tempModel = _votingService.GetAll().Where(v => v.StatusSetterId == UserId);
+                    break;
+                case "created":
+                    tempModel = _votingService.GetAll().Where(v => v.AuthorId == UserId);
+                    break;
+                default:
+                    tempModel = await _votingService.GetFilteredAndSortedForUserAsync(UserId);
+                    break;
+        };
+            var model = tempModel.Select(async m => new VotingReducedViewModel()
+            {
+                CreationDate = m.CreationDate,
+                ForPercentage = await _votingService.GetActualForPercentageAsync(m) * 100,
+                Id = m.Id,
+                Status = await _votingService.GetVotingStatusAsync(m),
+                IsSuccessfulNow = await _votingService.IsVotingSuccessfulNowAsync(m),
+                Name = m.Name,
+                Level = await _votingService.GetVotingLevelAsync(m)
+            }).Select(t => t.Result);
             return View(model);
         }
 

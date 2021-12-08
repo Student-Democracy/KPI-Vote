@@ -163,3 +163,66 @@ input {
         background-color: #023770;
     }
 }
+
+.small-icon {
+    width: 20px;
+}
+
+.create-voting>a {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    text-align: left;
+}
+
+.votings-buttons 
+{
+    width: 100%; 
+    margin: 0 auto;
+}
+
+.col {
+  display: block;
+}
+
+.type-form input{
+  display: none;
+}
+
+.type-form label{
+  position: relative;
+  color: #fff;
+  background-color: #1a68a6;
+  font-size: 20px;
+  text-align: center;
+  display: block;
+  cursor: pointer;
+  padding: 10px 25px;
+  border-radius: 15px;
+}
+
+.type-form input:checked + label{
+  background-color: #023770;
+}
+
+.type-form input:hover + label{
+    background-color: #023770;
+}
+
+.type-form {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: left;
+    gap: 10px;
+}
+
+@media (max-width: 650px) {
+    .type-form input:hover + label{
+        background-color: #1a68a6;
+    }
+    .type-form input:active + label{
+        background-color: #023770;
+      }
+}
