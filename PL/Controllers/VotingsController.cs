@@ -23,11 +23,20 @@ namespace PL.Controllers
 
         private readonly UserManager<User> _userManager;
 
-        public VotingsController(IVotingService votingService, UserManager<User> userManager, IVoteService voteService)
+        private readonly IGroupService _groupService;
+
+        private readonly IFlowService _flowService;
+
+        private readonly IFacultyService _facultyService;
+
+        public VotingsController(IVotingService votingService, UserManager<User> userManager, IVoteService voteService, IGroupService groupService, IFlowService flowService, IFacultyService facultyService)
         {
             _votingService = votingService;
             _userManager = userManager;
             _voteService = voteService;
+            _groupService = groupService;
+            _flowService = flowService;
+            _facultyService = facultyService;
         }
 
         // GET: VotingsController
@@ -56,7 +65,7 @@ namespace PL.Controllers
         {
             var model = await _votingService.GetByIdAsync(id);
             VotingViewModel mappedModel = null;
-            if (model != null)
+            if (model != null && await CanUserViewVotingAsync(model))
             {
                 mappedModel = new VotingViewModel()
                 {
@@ -99,34 +108,62 @@ namespace PL.Controllers
             }
             else
             {
-                ModelState.AddModelError("VotingNotFoundError", "Такого голосування не знайдено");
+                ModelState.AddModelError("VotingNotFoundError", "Такого голосування не знайдено або ви не маєте до нього доступу");
             }
             return View(mappedModel);
+        }
+
+        private async Task<bool> CanUserViewVotingAsync(VotingModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var group = await _groupService.GetByIdAsync(user.GroupId);
+            var flow = await _flowService.GetByIdAsync(group.FlowId);
+            var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
+            if (await _userManager.IsInRoleAsync(user, "Адміністратор"))
+                return true;
+            else if (model.GroupId == group.Id || model.FlowId == flow.Id || model.FacultyId == faculty.Id
+                || (model.GroupId is null && model.FlowId is null && model.FacultyId is null))
+                return true;
+            else if (await _userManager.IsInRoleAsync(user, "Голова СР КПІ") && !(model.FacultyId is null))
+                return true;
+            else if (await _userManager.IsInRoleAsync(user, "Голова СР Факультету") && !(model.FlowId is null) && (await _flowService.GetByIdAsync((int)model.FlowId)).FacultyId == faculty.Id)
+                return true;
+            else if (await _userManager.IsInRoleAsync(user, "Староста потоку") && !(model.GroupId is null) && (await _groupService.GetByIdAsync((int)model.GroupId)).FlowId == flow.Id)
+                return true;
+            return false;
         }
 
         [HttpPost]
         [Route("Votings/{id}")]
         public async Task<IActionResult> Vote(int id, VotingViewModel model)
         {
-            try
+            var votingModel = await _votingService.GetByIdAsync(id);
+            if (!(votingModel is null) && await CanUserViewVotingAsync(votingModel))
             {
-                var voteModel = new VoteModel() 
-                { 
-                    VotingId = id, 
-                    UserId = UserId,
-                    Result = model.UserVote switch
+                try
+                {
+                    var voteModel = new VoteModel()
                     {
-                        "ЗА" => VoteResult.For,
-                        "ПРОТИ" => VoteResult.Against,
-                        _ => VoteResult.Neutral
-                    }
+                        VotingId = id,
+                        UserId = UserId,
+                        Result = model.UserVote switch
+                        {
+                            "ЗА" => VoteResult.For,
+                            "ПРОТИ" => VoteResult.Against,
+                            _ => VoteResult.Neutral
+                        }
                     };
-                await _voteService.AddAsync(voteModel);
+                    await _voteService.AddAsync(voteModel);
 
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError("VoteError", exc.Message);
+                }
             }
-            catch (Exception exc)
+            else
             {
-                ModelState.AddModelError("VoteError", exc.Message);
+                ModelState.AddModelError("VoteError", "Такого голосування не знайдено або ви не маєте до нього доступу");
             }
             return RedirectToAction("Details", new { id });
         }
