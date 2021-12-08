@@ -25,6 +25,7 @@ namespace PL.Controllers
         }
 
         [HttpGet]
+        [Route("About")]
         public IActionResult About()
         {
             return View();
