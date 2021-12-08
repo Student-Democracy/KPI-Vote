@@ -116,9 +116,13 @@ namespace PL.Controllers
                 var authorName = author.LastName + " " + author.FirstName;
                 if (!(author.Patronymic is null))
                     authorName += " " + author.Patronymic;
-                var statusSetterName = statusSetter.LastName + " " + statusSetter.FirstName;
-                if (!(statusSetter.Patronymic is null))
-                    statusSetterName += " " + statusSetter.Patronymic;
+                string statusSetterName = null;
+                if (!(statusSetter is null))
+                {
+                    statusSetterName = statusSetter.LastName + " " + statusSetter.FirstName;
+                    if (!(statusSetter.Patronymic is null))
+                        statusSetterName += " " + statusSetter.Patronymic;
+                }
                 mappedModel.Author = authorName;
                 mappedModel.StatusSetter = statusSetterName;
                 var userVote = _voteService.GetAll().Where(v => v.UserId == UserId && v.VotingId == model.Id).SingleOrDefault();

@@ -32,7 +32,14 @@ else
                 <p>Продовжиться до: @Model.CompletionDate</p>
                 <p>Рівень: @Model.Level</p>
                 <br><p>Автор: <a href="/Users/UserProfiles/@Model.AuthorId">@Model.Author</a></p>
-                <p>Перевірив: <a href="/Users/UserProfiles/@Model.StatusSetterId">@Model.StatusSetter</a></p>
+                @if (!(Model.StatusSetter is null))
+                {
+                    <p>Перевірив: <a href="/Users/UserProfiles/@Model.StatusSetterId">@Model.StatusSetter</a></p>
+                }
+                else
+                {
+                    <p>Ще не перевірено</p>
+                }
             </div>
             <div class="voting-main-right">
                 @if (Model.IsUserAbleToChangeStatus)
