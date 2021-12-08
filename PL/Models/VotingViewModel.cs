@@ -56,5 +56,7 @@ namespace PL.Models
 
         [Display(Name = "UserVote")]
         public string UserVote { get; set; }
+
+        public bool IsUserAbleToVote { get; set; }
     }
 }

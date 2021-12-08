@@ -66,15 +66,22 @@ else
             }
             else if (Model.Status == "активно")
             {
-                <form method="POST" asp-route="Votings/{id}">
-                    <input type="radio" id="FOR" name="UserVote" value="ЗА" class="for">
-                    <label for="FOR" class="for">ЗА</label><br>
-                    <input type="radio" id="AGAINST" name="UserVote" value="ПРОТИ" class="against">
-                    <label for="AGAINST" class="against">ПРОТИ</label><br>
-                    <input type="radio" id="NEUTRAL" name="UserVote" value="Нейтрально" required>
-                    <label for="NEUTRAL">Нейтрально</label><br>
-                    <button type="submit">Проголосувати</button>
-                </form>
+                @if (Model.IsUserAbleToVote)
+                {
+                    <form method="POST" asp-route="Votings/{id}">
+                        <input type="radio" id="FOR" name="UserVote" value="ЗА" class="for">
+                        <label for="FOR" class="for">ЗА</label><br>
+                        <input type="radio" id="AGAINST" name="UserVote" value="ПРОТИ" class="against">
+                        <label for="AGAINST" class="against">ПРОТИ</label><br>
+                        <input type="radio" id="NEUTRAL" name="UserVote" value="Нейтрально" required>
+                        <label for="NEUTRAL">Нейтрально</label><br>
+                        <button type="submit">Проголосувати</button>
+                    </form>
+                }
+                else
+                {
+                    <p>Ви не можете проголосувати, тому що не належите до цієї групи/потоку/факультету</p>
+                }
             }
             else
             {

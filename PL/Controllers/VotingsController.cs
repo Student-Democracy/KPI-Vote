@@ -84,6 +84,7 @@ namespace PL.Controllers
                     VotesTotally = await _votingService.GetVotersNumberAsync(model),
                     AuthorId = model.AuthorId,
                     StatusSetterId = model.StatusSetterId,
+                    IsUserAbleToVote = await IsUserAbleToVoteAsync(model)
                 };
                 var author = await _userManager.FindByIdAsync(mappedModel.AuthorId);
                 var statusSetter = await _userManager.FindByIdAsync(mappedModel.StatusSetterId);
@@ -133,12 +134,24 @@ namespace PL.Controllers
             return false;
         }
 
+        private async Task<bool> IsUserAbleToVoteAsync(VotingModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var group = await _groupService.GetByIdAsync(user.GroupId);
+            var flow = await _flowService.GetByIdAsync(group.FlowId);
+            var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
+            if (model.GroupId == group.Id || model.FlowId == flow.Id || model.FacultyId == faculty.Id
+                || (model.GroupId is null && model.FlowId is null && model.FacultyId is null))
+                return true;
+            return false;
+        }
+
         [HttpPost]
         [Route("Votings/{id}")]
         public async Task<IActionResult> Vote(int id, VotingViewModel model)
         {
             var votingModel = await _votingService.GetByIdAsync(id);
-            if (!(votingModel is null) && await CanUserViewVotingAsync(votingModel))
+            if (!(votingModel is null) && await IsUserAbleToVoteAsync(votingModel))
             {
                 try
                 {
@@ -163,7 +176,7 @@ namespace PL.Controllers
             }
             else
             {
-                ModelState.AddModelError("VoteError", "Такого голосування не знайдено або ви не маєте до нього доступу");
+                ModelState.AddModelError("VoteError", "Ви не можете проголосувати, тому що не належите до цієї групи/потоку/факультету");
             }
             return RedirectToAction("Details", new { id });
         }
