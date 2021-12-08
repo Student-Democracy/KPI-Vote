@@ -40,3 +40,126 @@ main h2 {
 .voting-reduced-right {
     min-width: fit-content;
 }
+
+.voting {
+    border-top: 3px solid #1a68a6;
+    border-radius: 15px;
+    padding: 15px 15px;
+    padding-bottom: 0;
+}
+
+.voting>h3 {
+    font-size: 28pt;
+    font-weight: 500;
+}
+
+.voting-main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    padding: 15px 15px;
+    gap: 10px;
+}
+
+.voting-main-left {
+    text-align: left;
+}
+
+.voting-main-right {
+    text-align: right;
+}
+
+.voting-main-right>h3 {
+    text-align: right;
+    font-size: 32pt;
+}
+
+.description {
+    text-align: justify;
+}
+
+.description>h4 {
+    text-align: center;
+    font-size: 18pt;
+    font-weight: 500;
+}
+
+.vote {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.vote>h4 {
+    font-size: 16pt;
+    font-weight: 500;
+}
+
+.vote>p {
+    font-size: 14pt;
+    font-weight: 400;
+}
+
+.vote>form>button {
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+
+.for {
+    color: green
+}
+
+.against {
+    color: red
+}
+
+label {
+    font-weight: 600;
+    margin-right: 15px;
+    font-size: 14pt;
+}
+
+button {
+    width: 200px;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    padding: 15px 15px;
+    border-radius: 15px;
+    font-size: 14pt;
+    font-weight: 500;
+    color: #ffffff;
+    background-color: #1a68a6;
+    border-color: transparent;
+    outline: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #023770;
+}
+
+input {
+    margin-left: 15px;
+    margin-right: 5px;
+}
+
+@media (max-width: 650px) {
+    form {
+        width: 80%;
+    }
+    button {
+        background-color: #1a68a6;
+    }
+
+    button:hover {
+        background-color: #1a68a6;
+    }
+    
+    button:active {
+        background-color: #023770;
+    }
+}

@@ -310,7 +310,7 @@ namespace BLL.Services
             }
             else
             {
-                if (model.CompletionDate.AddDays(model.VisibilityTerm) >= DateTime.Now)
+                if (model.CompletionDate >= DateTime.Now)
                     return "активно";
                 else
                 {

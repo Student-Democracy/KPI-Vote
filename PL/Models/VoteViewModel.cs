@@ -8,6 +8,6 @@ namespace PL.Models
 {
     public class VoteViewModel
     {
-        public VoteResult Result { get; set; }
+        public string Result { get; set; }
     }
 }

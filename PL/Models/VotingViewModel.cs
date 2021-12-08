@@ -8,8 +8,6 @@ namespace PL.Models
 {
     public class VotingViewModel
     {
-        public int Id { get; set; }
-
         public string Name { get; set; }
 
         public string Description { get; set; }
@@ -35,7 +33,7 @@ namespace PL.Models
 
         public short VisibilityTerm { get; set; }
 
-        public VotingStatus Status { get; set; }
+        public string Status { get; set; }
 
 
         public string Author { get; set; }
@@ -54,5 +52,8 @@ namespace PL.Models
         public int VotesTotally { get; set; }
 
         public bool IsSuccessfulNow { get; set; }
+
+
+        public VoteViewModel UserVote { get; set; }
     }
 }

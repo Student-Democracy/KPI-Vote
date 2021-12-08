@@ -4,6 +4,7 @@ using BLL.Services;
 using DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PL.Models;
 using System;
@@ -18,13 +19,20 @@ namespace PL.Controllers
     {
         private readonly IVotingService _votingService;
 
-        public VotingsController(IVotingService votingService)
+        private readonly IVoteService _voteService;
+
+        private readonly UserManager<User> _userManager;
+
+        public VotingsController(IVotingService votingService, UserManager<User> userManager, IVoteService voteService)
         {
             _votingService = votingService;
+            _userManager = userManager;
+            _voteService = voteService;
         }
 
         // GET: VotingsController
         [HttpGet]
+        [Route("Votings")]
         public async Task<IActionResult> Index()
         {
             IEnumerable<VotingReducedViewModel> model = (await _votingService.GetFilteredAndSortedForUserAsync(UserId))
@@ -42,9 +50,57 @@ namespace PL.Controllers
         }
 
         // GET: VotingsController/Details/5
-        public IActionResult Details(int id)
+        [Route("Votings/{id}")]
+        public async Task<IActionResult> Details(int id)
         {
-            return View();
+            var model = await _votingService.GetByIdAsync(id);
+            VotingViewModel mappedModel = null;
+            if (model != null)
+            {
+                mappedModel = new VotingViewModel()
+                {
+                    CreationDate = model.CreationDate,
+                    CompletionDate = model.CompletionDate,
+                    Status = await _votingService.GetVotingStatusAsync(model),
+                    Name = model.Name,
+                    Description = model.Description,
+                    IsSuccessfulNow = await _votingService.IsVotingSuccessfulNowAsync(model),
+                    Level = await _votingService.GetVotingLevelAsync(model),
+                    UserVote = null,
+                    MinimalAttendancePercentage = model.MinimalAttendancePercentage,
+                    MinimalForPercentage = model.MinimalForPercentage,
+                    AttendancePercentage = await _votingService.GetActualAttendancePercentageAsync(model) * 100,
+                    VotesFor = await _votingService.GetVotersForNumberAsync(model),
+                    VotesTotally = await _votingService.GetVotersNumberAsync(model),
+                    AuthorId = model.AuthorId,
+                    StatusSetterId = model.StatusSetterId,
+                };
+                var author = await _userManager.FindByIdAsync(mappedModel.AuthorId);
+                var statusSetter = await _userManager.FindByIdAsync(mappedModel.StatusSetterId);
+                var authorName = author.LastName + " " + author.FirstName;
+                if (!(author.Patronymic is null))
+                    authorName += " " + author.Patronymic;
+                var statusSetterName = statusSetter.LastName + " " + statusSetter.FirstName;
+                if (!(statusSetter.Patronymic is null))
+                    statusSetterName += " " + statusSetter.Patronymic;
+                mappedModel.Author = authorName;
+                mappedModel.StatusSetter = statusSetterName;
+                var userVote = _voteService.GetAll().Where(v => v.UserId == UserId && v.VotingId == model.Id).SingleOrDefault();
+                if (!(userVote is null))
+                {
+                    mappedModel.UserVote = userVote.Result switch
+                    {
+                        VoteResult.For => new VoteViewModel() { Result = "ЗА" },
+                        VoteResult.Against => new VoteViewModel() { Result = "ПРОТИ" },
+                        _ => new VoteViewModel() { Result = "Нейтрально" },
+                    };
+                }    
+            }
+            else
+            {
+                ModelState.AddModelError("VotingNotFoundError", "Такого голосування не знайдено");
+            }
+            return View(mappedModel);
         }
 
         // GET: VotingsController/Create
