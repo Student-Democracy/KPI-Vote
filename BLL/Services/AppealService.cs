@@ -99,5 +99,13 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Model's admin id cannot be null or empty");
             await UpdateAsync(model);
         }
+
+        public async Task<IEnumerable<AppealModel>> GetUnresponsedAppealsAsync()
+        {
+            var needResponse = await _context.Appeals
+                .Where(a => a.Response == null)
+                .ToListAsync();
+            return _mapper.Map<IEnumerable<AppealModel>>(needResponse);
+        }
     }
 }

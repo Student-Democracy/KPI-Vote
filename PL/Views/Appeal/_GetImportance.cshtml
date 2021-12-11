@@ -1,0 +1,11 @@
+﻿@{
+    <option disabled selected value="default">Виберіть тему звернення</option>
+    var importance = 1;
+    foreach (var theme in PL.Data.AppealThemes.Themes)
+    {
+        <option value="@importance">@theme</option>
+        importance++;
+    }
+}
+
+

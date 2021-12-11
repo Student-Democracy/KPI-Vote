@@ -8,5 +8,6 @@ namespace BLL.Interfaces
     {
         Task<IEnumerable<AppealModel>> GetUserAppealsAsync(string userId);
         Task ResponseAppealAsync(AppealModel model);
+        Task<IEnumerable<AppealModel>> GetUnresponsedAppealsAsync();
     }
 }

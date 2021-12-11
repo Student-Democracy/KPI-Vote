@@ -1,0 +1,24 @@
+﻿@model BLL.Models.AppealModel
+
+@{
+    ViewData["Title"] = "Редагування звернення";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/appeal.css" />
+}
+
+<form class="appeal_item" asp-controller="Appeal" asp-action="Edit">
+    <div class="appeal-top">
+        <textarea class="text-field" asp-for="Message"></textarea>
+    </div>
+    <div class="warning"><p>@Html.ValidationMessage("EmptyMessage")</p></div>
+    <hr>
+    <div class="response">чекає відповіді...</div>
+    <select class="importance" style="width: 50%;" asp-for="Importance">
+        @Html.RenderPartialAsync("_GetImportance");
+    </select>
+    <div class="warning"><p>@Html.ValidationMessage("WrongImportance")</p></div>
+    <div class="date">Дата створення: @Model.Date</div>
+    <input type="submit" class="edit-btn" value="Зберегти">
+</form>
