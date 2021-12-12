@@ -86,9 +86,19 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(userId), "No such a user");
             var appeals = await _context.Appeals
                 .Where(a => a.UserId == userId)
-                .OrderByDescending(a=>a.Date)
+                .OrderByDescending(a=>a.Date.Date)
+                .ThenBy(a=>a.Importance)
                 .ToListAsync();
-            return _mapper.Map<IEnumerable<AppealModel>>(appeals);
+            var unresponsedAppeals = new List<Appeal>();
+            var responsedAppeals = new List<Appeal>();
+            foreach (var item in appeals)
+            {
+                if (item.Response == null)
+                    unresponsedAppeals.Add(item);
+                else
+                    responsedAppeals.Add(item);
+            }
+            return _mapper.Map<IEnumerable<AppealModel>>(unresponsedAppeals.Concat(responsedAppeals));
         }
 
         public async Task ResponseAppealAsync(AppealModel model)
@@ -104,6 +114,8 @@ namespace BLL.Services
         {
             var needResponse = await _context.Appeals
                 .Where(a => a.Response == null)
+                .OrderByDescending(a => a.Date.Date)
+                .ThenBy(a => a.Importance)
                 .ToListAsync();
             return _mapper.Map<IEnumerable<AppealModel>>(needResponse);
         }

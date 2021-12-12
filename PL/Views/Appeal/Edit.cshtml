@@ -14,9 +14,8 @@
     </div>
     <div class="warning"><p>@Html.ValidationMessage("EmptyMessage")</p></div>
     <hr>
-    <div class="response">чекає відповіді...</div>
     <select class="importance" style="width: 50%;" asp-for="Importance">
-        @Html.RenderPartialAsync("_GetImportance");
+        @Html.RenderPartialAsync("_GetImportance",Model.Importance);
     </select>
     <div class="warning"><p>@Html.ValidationMessage("WrongImportance")</p></div>
     <div class="date">Дата створення: @Model.Date</div>

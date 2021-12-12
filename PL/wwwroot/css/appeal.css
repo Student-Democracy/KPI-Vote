@@ -2,22 +2,13 @@
     --border-style: solid 2px rgb(50, 50, 238);
 }
 
-a{
-    text-decoration: none;
-    color: black !important;
-}
-
 .appeal_item {
     border: var(--border-style);
-    border-bottom: none;
     display: flex;
     flex-direction: column;
     padding: 5px 5px;
     word-wrap: anywhere;
-}
-
-.appeal_item:last-child {
-    border-bottom: var(--border-style);
+    margin-top: 10px;
 }
 
 .person, .edit, .delete, .respond {
@@ -46,6 +37,7 @@ a{
     padding: 0 5px;
     cursor: pointer;
     transition: .8 linear;
+    color: black !important;
 }
 
 .edit{

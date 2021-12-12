@@ -36,23 +36,31 @@ namespace PL.Controllers
         {
             if (string.IsNullOrWhiteSpace(model.Message))
                 ModelState.AddModelError("EmptyMessage", "Звернення не може бути порожнім.");
+            else
+                ViewBag.Message = model.Message;
             if (model.Importance <= 0)
                 ModelState.AddModelError("WrongImportance", "Виберіть одну з тем звернення.");
+            else
+                ViewBag.Importance = model.Importance;
             if (ModelState.IsValid)
             {
                 model.UserId = UserId;
                 await _appealService.AddAsync(model);
+                return RedirectToAction("Index");
             }
-            var vms = await GetAppealViewModelsAsync();
-            return View("Index",vms);
+            else
+            {
+                var vms = await GetAppealViewModelsAsync();
+                return View("Index", vms);
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             var appeal = await _appealService.GetByIdAsync(id);
-            if (appeal.UserId != UserId)
-                Redirect("Index");
+            if (appeal==null||appeal.UserId != UserId)
+                RedirectToAction("Index");
             return View(appeal);
         }
 
@@ -60,7 +68,8 @@ namespace PL.Controllers
         public async Task<IActionResult> Edit(AppealModel model)
         {
             var appeal = await _appealService.GetByIdAsync(model.Id);
-            model.Date = appeal.Date;
+            if (appeal == null)
+                return RedirectToAction("Index");
             if (string.IsNullOrWhiteSpace(model.Message))
             {
                 ModelState.AddModelError("EmptyMessage", "Звернення не може бути порожнім.");
@@ -68,9 +77,10 @@ namespace PL.Controllers
             if (model.Importance <= 0)
                 ModelState.AddModelError("WrongImportance", "Виберіть одну з тем звернення.");
             if(!ModelState.IsValid)
-                return View(model);
-            model.UserId = UserId;
-            await _appealService.UpdateAsync(model);
+                return View(appeal);
+            appeal.Importance = model.Importance;
+            appeal.Message = model.Message;
+            await _appealService.UpdateAsync(appeal);
             return RedirectToAction("Index");
         }
         
@@ -78,15 +88,7 @@ namespace PL.Controllers
         public async Task<IActionResult> DeleteAppealByUser(int id)
         {
             var appeal = await _appealService.GetByIdAsync(id);
-            if (appeal.UserId != UserId)
-                Redirect("Index");
-            if (appeal.Response != null)
-            {
-                ModelState.AddModelError("DeleteError", "Не можна видалити звернення, на яке отримана відповідь.");
-                var vms = await GetAppealViewModelsAsync();
-                return View("Index", vms);
-            }
-            else
+            if (appeal!=null&&appeal.UserId == UserId)
                 await _appealService.DeleteByIdAsync(id);
             return RedirectToAction("Index");
         }
@@ -95,7 +97,9 @@ namespace PL.Controllers
         [Authorize(Roles = "Адміністратор")]
         public async Task<IActionResult> DeleteAppealByAdmin(int id)
         {
-            await _appealService.DeleteByIdAsync(id);
+            var appeal = await _appealService.GetByIdAsync(id);
+            if(appeal!=null)
+                await _appealService.DeleteByIdAsync(id);
             return RedirectToAction("UnresponsedAppeals");
         }
 
@@ -111,8 +115,8 @@ namespace PL.Controllers
                 {
                     Id = appeal.Id,
                     Message = appeal.Message,
-                    Response = appeal.Response,
                     User = _userManager.GetUserName(User),
+                    Importance = appeal.Importance,
                     CreationDate = appeal.Date
                 });
             }
@@ -124,6 +128,8 @@ namespace PL.Controllers
         public async Task<IActionResult> RespondAppeal(int id)
         {
             var appeal = await _appealService.GetByIdAsync(id);
+            if (appeal == null)
+                return RedirectToAction("UnresponsedAppeals");
             var appealVm = new AppealViewModel
             {
                 Id = appeal.Id,
@@ -139,6 +145,8 @@ namespace PL.Controllers
         public async Task<IActionResult> RespondAppeal(AppealModel model)
         {
             var appeal = await _appealService.GetByIdAsync(model.Id);
+            if (appeal == null || appeal.Response!=null)
+                return RedirectToAction("UnresponsedAppeals");
             if (string.IsNullOrWhiteSpace(model?.Response))
             {
                 ModelState.AddModelError("EmptyResponse", "Відповідь не може бути порожньою.");
