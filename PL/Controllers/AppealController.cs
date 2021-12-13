@@ -115,7 +115,7 @@ namespace PL.Controllers
                 {
                     Id = appeal.Id,
                     Message = appeal.Message,
-                    User = _userManager.GetUserName(User),
+                    User = (await _userManager.FindByIdAsync(appeal.UserId)).UserName,
                     Importance = appeal.Importance,
                     CreationDate = appeal.Date
                 });
