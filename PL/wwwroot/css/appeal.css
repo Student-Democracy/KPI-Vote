@@ -59,6 +59,7 @@
 .appeal-top {
     display: flex;
     margin-bottom: 1px;
+    margin-top: 10px;
 }
 
 .importance {
@@ -107,4 +108,9 @@
 
 .warning{
     color: red;
+}
+
+.admin-btn {
+    display: block;
+    margin-bottom: 10px;
 }

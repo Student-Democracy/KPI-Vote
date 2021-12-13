@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="~/css/appeal.css" />
 }
 
+@{
+    if (User.IsInRole("Адміністратор"))
+    {
+        <a class="admin-btn" asp-controller="Appeal" asp-action="UnresponsedAppeals">Нерозглянуті звернення</a>
+    }
+}
 <form method="post" class="appeal-form" asp-controller="Appeal" asp-action="Create">
     <div class="appeal-top">
         <textarea class="text-field" name="message">@ViewBag.Message</textarea>
@@ -20,7 +26,7 @@
                 await Html.RenderPartialAsync("_GetImportance");
             else
             {
-                short importance = ViewBag.Importance?? (short)0;
+                short importance = ViewBag.Importance ?? (short)0;
                 await Html.RenderPartialAsync("_GetImportance", importance);
             }
         }
@@ -33,32 +39,32 @@
     @{
         foreach (var appeal in Model)
         {
-        <div class="appeal_item">
-            <div class="appeal-top">
-                <div class="message">@appeal.Message</div>
-                @{
-                    if (appeal.Response == null)
-                    {
-                        <div class="buttons">
-                            <a class="edit" asp-controller="Appeal" asp-action="Edit" asp-route-id="@appeal.Id">edit</a>
-                            <a class="delete" asp-controller="Appeal" asp-action="DeleteAppealByUser" asp-route-id="@appeal.Id">delete</a>
-                        </div>
+            <div class="appeal_item">
+                <div class="appeal-top">
+                    <div class="message">@appeal.Message</div>
+                    @{
+                        if (appeal.Response == null)
+                        {
+                            <div class="buttons">
+                                <a class="edit" asp-controller="Appeal" asp-action="Edit" asp-route-id="@appeal.Id">edit</a>
+                                <a class="delete" asp-controller="Appeal" asp-action="DeleteAppealByUser" asp-route-id="@appeal.Id">delete</a>
+                            </div>
+                        }
                     }
+                </div>
+                <hr>
+                @if (appeal.Response != null)
+                {
+                    <div class="response">@appeal.Response</div>
+                    <div class="person">@appeal.Admin</div>
+                    <div class="date">Дата створення: @appeal.CreationDate</div>
+                }
+                else
+                {
+                    <div class="person">чекає відповіді...</div>
+                    <div class="date">Дата створення: @appeal.CreationDate</div>
                 }
             </div>
-            <hr>
-            @if (appeal.Response != null)
-            {
-                <div class="response">@appeal.Response</div>
-                <div class="person">@appeal.Admin</div>
-                <div class="date">Дата створення: @appeal.CreationDate</div>
-            }
-            else
-            {
-                <div class="person">чекає відповіді...</div>
-                <div class="date">Дата створення: @appeal.CreationDate</div>
-            }
-        </div>
         }
     }
 </div>
