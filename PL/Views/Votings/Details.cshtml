@@ -44,22 +44,31 @@ else
             <div class="voting-main-right">
                 @if (Model.IsUserAbleToChangeStatus)
                 {
-                    <div class="blocks">
-                        @if (Model.Status == "заявка" || Model.Status == "відмовлено")
-                        {
-                            <form id="approve" method="POST" asp-controller="Votings" asp-action="Approve">
-                                <input type="hidden" name="id" value="@Model.Id">
-                                <button type="submit" class="block blue">Затвердити</button>
-                            </form>
-                        }
-                        @if (Model.Status != "відмовлено")
-                        {
-                            <form id="block" method="POST" asp-controller="Votings" asp-action="Block">
-                                <input type="hidden" name="id" value="@Model.Id">
-                                <button type="submit" class="block gray">Заблокувати</button>
-                            </form>
-                        }
-                    </div>
+                <div class="blocks">
+                    @if (Model.IsUserAbleToEdit)
+                    {
+                        <form id="edit" method="GET" asp-controller="Votings" asp-action="Edit" asp-route-id="@Model.Id">
+                            <button type="submit" class="block gray">Редагувати</button>
+                        </form>
+                        <form id="delete" method="GET" asp-controller="Votings" asp-action="Delete" asp-route-id="@Model.Id">
+                            <button type="submit" class="block gray">Видалити</button>
+                        </form>
+                    }
+                    @if (Model.Status == "заявка" || Model.Status == "відмовлено")
+                    {
+                        <form id="approve" method="POST" asp-controller="Votings" asp-action="Approve">
+                            <input type="hidden" name="id" value="@Model.Id">
+                            <button type="submit" class="block blue">Затвердити</button>
+                        </form>
+                    }
+                    @if (Model.Status != "відмовлено")
+                    {
+                        <form id="block" method="POST" asp-controller="Votings" asp-action="Block">
+                            <input type="hidden" name="id" value="@Model.Id">
+                            <button type="submit" class="block gray">Заблокувати</button>
+                        </form>
+                    }
+                </div>
                 }
                 @{
                     var percentageColor = (Model.IsSuccessfulNow) ? "green" : "red";

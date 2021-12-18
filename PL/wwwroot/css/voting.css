@@ -323,3 +323,21 @@ textarea {
     color: red;
     margin-top: 15px;
 }
+
+.red {
+    background-color: red !important;
+}
+
+    .red:hover {
+        background-color: darkred !important;
+    }
+
+@media (max-width: 650px) {
+    .red:hover {
+        background-color: red !important;
+    }
+
+    .red:active {
+        background-color: darkred !important;
+    }
+}

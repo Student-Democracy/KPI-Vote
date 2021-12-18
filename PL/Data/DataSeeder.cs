@@ -175,6 +175,9 @@ namespace PL.Data
                     await AppealService.AddAsync(appeal);
                 }
             }
+            var votingDescription = " Mauris mattis neque eget orci pulvinar sagittis. Fusce cursus urna eget magna faucibus, et vulputate justo condimentum. Curabitur ac volutpat odio, in scelerisque dolor. Nulla facilisi. Fusce lobortis luctus turpis a luctus. Nullam at odio congue, pretium elit eget, sollicitudin ligula. Pellentesque vitae turpis non nunc commodo fringilla. In et imperdiet metus. Pellentesque tristique, ante sed vehicula ultricies, ipsum metus dapibus massa, in convallis leo urna nec enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec nec molestie odio, ac tristique sem. Phasellus non dui ante. Praesent tristique, diam non congue facilisis, ipsum tellus viverra nibh, eget dapibus dui urna sed velit.";
+            for (int i = 0; i < 1000; i++)
+                votingDescription += 'a';
             var votings = new VotingModel[]
             {
                 new VotingModel() { Name = "Voting 1",
@@ -187,6 +190,7 @@ namespace PL.Data
             {
                 foreach (var voting in votings)
                 {
+                    voting.Description += votingDescription;
                     await VotingService.AddAsync(voting);
                 }
             }

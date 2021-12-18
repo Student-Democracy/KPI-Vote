@@ -78,5 +78,7 @@ namespace PL.Models
         public bool IsUserAbleToChangeStatus { get; set; }
 
         public UserAsAuthorViewModel User { get; set; }
+
+        public bool IsUserAbleToEdit { get; set; }
     }
 }

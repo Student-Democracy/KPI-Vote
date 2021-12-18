@@ -23,5 +23,7 @@ namespace PL.Models
         public decimal ForPercentage { get; set; }
 
         public bool IsUserAbleToChangeStatus { get; set; }
+
+        public bool IsUserAbleToEdit { get; set; }
     }
 }
