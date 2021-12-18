@@ -39,8 +39,6 @@ namespace PL.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            if (!User.Identity.IsAuthenticated)
-                return RedirectToAction("Login", "Account");
             var user = await _userManager.GetUserAsync(User);
             var name = user.LastName + " " + user.FirstName;
             if (!(user.Patronymic is null))

@@ -293,3 +293,33 @@ input {
         background-color: black;
     }
 }
+
+select {
+    background-color: white;
+    outline: none;
+    border: 1px solid gray;
+    border-radius: 2px;
+    margin-left: 15px;
+    margin-right: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+textarea {
+    width: 100%;
+    resize: none;
+    min-height: 30vh;
+    font-size: 12pt;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.add-voting > button {
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+
+.warning {
+    text-align: center;
+    color: red;
+    margin-top: 15px;
+}

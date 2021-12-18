@@ -21,6 +21,8 @@ namespace BLL.Services
 
         private const short _minDescriptionLength = 1000;
 
+        private const int _maxDescriptionLength = 50000;
+
         private const short _maxNameLength = 250;
 
         private const short _maxVisibilityTerm = 31;
@@ -44,9 +46,10 @@ namespace BLL.Services
                     nameof(model));
             if (string.IsNullOrEmpty(model.Description))
                 throw new ArgumentNullException(nameof(model), "Model's description cannot be null or empty");
+            var length = model.Description.Length;
             var realLength = model.Description.Trim().Length;
-            if (realLength < _minDescriptionLength)
-                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters in the start and in the end. It was {realLength}",
+            if (realLength < _minDescriptionLength || length > _maxDescriptionLength)
+                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters in the start and in the end. It was {realLength}. Or, it was greater than {_maxDescriptionLength}",
                     nameof(model));
             if (model.MinimalForPercentage < _minForPercentage || model.MinimalForPercentage > 100)
                 throw new ArgumentException($"Model's minimal for percentage cannot be less than {_minForPercentage} or bigger than 100", 
@@ -99,9 +102,10 @@ namespace BLL.Services
                     nameof(model));
             if (string.IsNullOrEmpty(model.Description))
                 throw new ArgumentNullException(nameof(model), "Model's description cannot be null or empty");
+            var length = model.Description.Length;
             var realLength = model.Description.Trim().Length;
-            if (realLength < _minDescriptionLength)
-                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters in the start and in the end. It was {realLength}",
+            if (realLength < _minDescriptionLength || length > _maxDescriptionLength)
+                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters in the start and in the end. It was {realLength}. Or, it was greater than {_maxDescriptionLength}",
                     nameof(model));
             if (model.MinimalForPercentage < _minForPercentage || model.MinimalForPercentage > 100)
                 throw new ArgumentException($"Model's minimal for percentage cannot be less than or equal {_minForPercentage} or greater than 100",
@@ -209,7 +213,16 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Status setter's id cannot be null");
             if (await _context.Users.FindAsync(model.StatusSetterId) is null)
                 throw new InvalidOperationException("Status setter's was not found");
-            await UpdateAsync(model);
+            var existingModel = await _context.Votings.FindAsync(model.Id);
+            if (existingModel is null)
+                throw new ArgumentException("Model was not found", nameof(model));
+            if (!(existingModel is null) && model.CreationDate != existingModel.CreationDate)
+                throw new ArgumentException("The creation date cannot be changed", nameof(model));
+            if (!(existingModel is null) && model.AuthorId != existingModel.AuthorId)
+                throw new ArgumentException("Author cannot be changed", nameof(model));
+            existingModel = _mapper.Map(model, existingModel);
+            _context.Votings.Update(existingModel);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> IsVotingSuccessfulAsync(VotingModel model)

@@ -11,13 +11,21 @@ namespace PL.Models
     {
         public int Id { get; set; }
 
+        [Required]
+        [Display(Name = "Name")]
         public string Name { get; set; }
 
+        [Required]
+        [Display(Name = "Description")]
         public string Description { get; set; }
 
-        public decimal MinimalForPercentage { get; set; }
+        [Required]
+        [Display(Name = "MinimalForPercentage")]
+        public decimal? MinimalForPercentage { get; set; }
 
-        public decimal MinimalAttendancePercentage { get; set; }
+        [Required]
+        [Display(Name = "MinimalAttendancePercentage")]
+        public decimal? MinimalAttendancePercentage { get; set; }
 
         public decimal ForPercentage { 
             get {
@@ -30,11 +38,15 @@ namespace PL.Models
 
         public decimal AttendancePercentage { get; set; }
 
-        public DateTime CreationDate { get; set; }
+        public DateTime? CreationDate { get; set; }
 
-        public DateTime CompletionDate { get; set; }
+        [Required]
+        [Display(Name = "CompletionDate")]
+        public DateTime? CompletionDate { get; set; }
 
-        public short VisibilityTerm { get; set; }
+        [Required]
+        [Display(Name = "VisibilityTerm")]
+        public short? VisibilityTerm { get; set; }
 
         public string Status { get; set; }
 
@@ -47,6 +59,8 @@ namespace PL.Models
 
         public string StatusSetterId { get; set; }
 
+        [Required]
+        [Display(Name = "Level")]
         public string Level { get; set; }
 
 
@@ -62,5 +76,7 @@ namespace PL.Models
         public bool IsUserAbleToVote { get; set; }
 
         public bool IsUserAbleToChangeStatus { get; set; }
+
+        public UserAsAuthorViewModel User { get; set; }
     }
 }

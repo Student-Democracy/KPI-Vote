@@ -270,26 +270,75 @@ namespace PL.Controllers
         // GET: VotingsController/Create
         [HttpGet]
         [Route("Votings/Create")]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(VotingViewModel model)
         {
-            var p = Request.Headers["Referer"].ToString();
-            return View();
+            if (model.VisibilityTerm is null)
+                model.VisibilityTerm = 5;
+            if (model.User is null)
+                model.User = new UserAsAuthorViewModel();
+            var user = await _userManager.GetUserAsync(User);
+            var name = user.LastName + " " + user.FirstName;
+            if (!(user.Patronymic is null))
+                name += " " + user.Patronymic;
+            var group = await _groupService.GetByIdAsync(user.GroupId);
+            var flow = await _flowService.GetByIdAsync(group.FlowId);
+            var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
+            var groupName = flow.Name + group.Number;
+            var flowName = flow.Name + 'X';
+            if (!(flow.Postfix is null))
+            {
+                groupName += flow.Postfix;
+                flowName += flow.Postfix;
+            }
+            model.User.Group = groupName;
+            model.User.Flow = flowName;
+            model.User.Faculty = faculty.Name;
+            return View(model);
         }
 
         // POST: VotingsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Votings/Create")]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> CreateConfirmed(VotingViewModel model)
         {
+            var user = await _userManager.GetUserAsync(User);
+            var votingModel = new VotingModel()
+            {
+                Name = model.Name,
+                Description = model.Description,
+                CompletionDate = (DateTime)model.CompletionDate,
+                VisibilityTerm = (short)model.VisibilityTerm,
+                MinimalAttendancePercentage = (decimal)model.MinimalAttendancePercentage,
+                MinimalForPercentage = (decimal)model.MinimalForPercentage,
+                AuthorId = user.Id
+            };
+            var group = await _groupService.GetByIdAsync(user.GroupId);
+            var flow = await _flowService.GetByIdAsync(group.FlowId);
+            switch (model.Level)
+            {
+                case "group":
+                    votingModel.GroupId = user.GroupId;
+                    break;
+                case "flow":
+                    votingModel.FlowId = group.FlowId;
+                    break;
+                case "faculty":
+                    votingModel.FacultyId = flow.FacultyId;
+                    break;
+            }
             try
             {
-                return RedirectToAction(nameof(Index));
+                await _votingService.AddAsync(votingModel);
+                var id = _votingService.GetAll().Where(v => v.AuthorId == UserId).Where(v => v.Name == votingModel.Name).LastOrDefault().Id;
+                return RedirectToAction("Details", "Votings", new { id = id});
             }
-            catch
+            catch (Exception exc)
             {
-                return View();
+                ModelState.AddModelError("VotingCreationError", exc.Message);
+                ViewBag.VotingCreationError = exc.Message;
             }
+            return View(model);
         }
 
         // GET: VotingsController/Edit/5
