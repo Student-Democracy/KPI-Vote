@@ -270,7 +270,7 @@ namespace PL.Controllers
         // GET: VotingsController/Create
         [HttpGet]
         [Route("Votings/Create")]
-        public async Task<IActionResult> Create(VotingViewModel model)
+        public async Task<IActionResult> Create(VotingViewModel model, string param = null)
         {
             if (model.VisibilityTerm is null)
                 model.VisibilityTerm = 5;
@@ -300,7 +300,7 @@ namespace PL.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Votings/Create")]
-        public async Task<IActionResult> CreateConfirmed(VotingViewModel model)
+        public async Task<IActionResult> Create(VotingViewModel model)
         {
             var user = await _userManager.GetUserAsync(User);
             var votingModel = new VotingModel()
@@ -331,12 +331,27 @@ namespace PL.Controllers
             {
                 await _votingService.AddAsync(votingModel);
                 var id = _votingService.GetAll().Where(v => v.AuthorId == UserId).Where(v => v.Name == votingModel.Name).LastOrDefault().Id;
-                return RedirectToAction("Details", "Votings", new { id = id});
+                return RedirectToAction("Details", "Votings", new { id });
             }
             catch (Exception exc)
             {
                 ModelState.AddModelError("VotingCreationError", exc.Message);
-                ViewBag.VotingCreationError = exc.Message;
+                if (model.User is null)
+                    model.User = new UserAsAuthorViewModel();
+                var name = user.LastName + " " + user.FirstName;
+                if (!(user.Patronymic is null))
+                    name += " " + user.Patronymic;
+                var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
+                var groupName = flow.Name + group.Number;
+                var flowName = flow.Name + 'X';
+                if (!(flow.Postfix is null))
+                {
+                    groupName += flow.Postfix;
+                    flowName += flow.Postfix;
+                }
+                model.User.Group = groupName;
+                model.User.Flow = flowName;
+                model.User.Faculty = faculty.Name;
             }
             return View(model);
         }
