@@ -420,73 +420,114 @@ namespace PL.Controllers
         {
             var existingModel = await _votingService.GetByIdAsync(id);
             var user = await _userManager.GetUserAsync(User);
-            existingModel.Name = model.Name;
-            existingModel.Description = model.Description;
-            existingModel.CompletionDate = (DateTime)model.CompletionDate;
-            existingModel.VisibilityTerm = (short)model.VisibilityTerm;
-            existingModel.MinimalAttendancePercentage = (decimal)model.MinimalAttendancePercentage;
-            existingModel.MinimalForPercentage = (decimal)model.MinimalForPercentage;
             var group = await _groupService.GetByIdAsync(user.GroupId);
             var flow = await _flowService.GetByIdAsync(group.FlowId);
-            switch (model.Level)
+            if (!(existingModel is null) && existingModel.AuthorId == user.Id)
             {
-                case "group":
-                    existingModel.GroupId = user.GroupId;
-                    break;
-                case "flow":
-                    existingModel.FlowId = group.FlowId;
-                    break;
-                case "faculty":
-                    existingModel.FacultyId = flow.FacultyId;
-                    break;
-            }
-            try
-            {
-                await _votingService.UpdateAsync(existingModel);
-                return RedirectToAction("Details", "Votings", new { id = existingModel.Id });
-            }
-            catch (Exception exc)
-            {
-                ModelState.AddModelError("VotingEditError", exc.Message);
-                if (model.User is null)
-                    model.User = new UserAsAuthorViewModel();
-                var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
-                var groupName = flow.Name + group.Number;
-                var flowName = flow.Name + 'X';
-                if (!(flow.Postfix is null))
+                existingModel.Name = model.Name;
+                existingModel.Description = model.Description;
+                existingModel.CompletionDate = (DateTime)model.CompletionDate;
+                existingModel.VisibilityTerm = (short)model.VisibilityTerm;
+                existingModel.MinimalAttendancePercentage = (decimal)model.MinimalAttendancePercentage;
+                existingModel.MinimalForPercentage = (decimal)model.MinimalForPercentage; 
+                switch (model.Level)
                 {
-                    groupName += flow.Postfix;
-                    flowName += flow.Postfix;
+                    case "group":
+                        existingModel.GroupId = user.GroupId;
+                        break;
+                    case "flow":
+                        existingModel.FlowId = group.FlowId;
+                        break;
+                    case "faculty":
+                        existingModel.FacultyId = flow.FacultyId;
+                        break;
                 }
-                model.User.Group = groupName;
-                model.User.Flow = flowName;
-                model.User.Faculty = faculty.Name;
-                model.CreationDate = existingModel.CreationDate;
+                try
+                {
+                    await _votingService.UpdateAsync(existingModel);
+                    return RedirectToAction("Details", "Votings", new { id = existingModel.Id });
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError("VotingEditError", exc.Message);
+                }
             }
+            else
+            {
+                ModelState.AddModelError("VotingNotFoundError", "Такого голосування не знайдено або ви не маєте доступу до його редагування");
+            }
+            if (model.User is null)
+                model.User = new UserAsAuthorViewModel();
+            var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
+            var groupName = flow.Name + group.Number;
+            var flowName = flow.Name + 'X';
+            if (!(flow.Postfix is null))
+            {
+                groupName += flow.Postfix;
+                flowName += flow.Postfix;
+            }
+            model.User.Group = groupName;
+            model.User.Flow = flowName;
+            model.User.Faculty = faculty.Name;
+            model.CreationDate = existingModel.CreationDate;
             return View(model);
         }
 
         // GET: VotingsController/Delete/5
         [Route("Votings/Delete/{id}")]
-        public ActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return View();
+            var model = await _votingService.GetByIdAsync(id);
+            var user = await _userManager.GetUserAsync(User);
+            VotingDeleteViewModel mappedModel = null;
+            if (!(model is null) && model.AuthorId == user.Id && model.Status == VotingStatus.NotConfirmed)
+            {
+                mappedModel = new VotingDeleteViewModel()
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    CreationDate = model.CreationDate,
+                    IsValid = true
+                };
+            }
+            else
+            {
+                ModelState.AddModelError("VotingNotFoundError", "Такого голосування не знайдено або ви не маєте доступу до його редагування");
+            }
+            return View(mappedModel);
         }
 
         // POST: VotingsController/Delete/5
         [HttpPost]
         [Route("Votings/Delete/{id}")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> Delete(int id, IFormCollection collection = null)
         {
-            try
+            var model = await _votingService.GetByIdAsync(id);
+            var user = await _userManager.GetUserAsync(User);
+            VotingDeleteViewModel viewModel = null;
+            if (!(model is null) && model.AuthorId == user.Id)
             {
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _votingService.DeleteByIdAsync(model.Id);
+                    return RedirectToAction("Index", "Votings", new { votingstype = "created" });
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError("VotingDeleteError", exc.Message);
+                    viewModel = new VotingDeleteViewModel()
+                    {
+                        Id = model.Id,
+                        IsValid = false
+                    };
+                }
             }
-            catch
+            else
             {
-                return View();
+                ModelState.AddModelError("VotingNotFoundError", "Такого голосування не знайдено або ви не маєте доступу до його редагування");
             }
+            return View(viewModel);
         }
     }
 }
