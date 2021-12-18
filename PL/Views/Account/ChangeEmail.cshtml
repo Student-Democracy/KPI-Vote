@@ -1,0 +1,26 @@
+﻿@model PL.Models.ChangeEmailViewModel
+
+@{
+    ViewData["Title"] = "Змінити електронну пошту";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/changestyle.css" />
+}
+
+<br>
+<h2>Змінити електронну пошту</h2>
+<form method="POST">
+    <label for="email"><b>Нова електронна пошта:</b></label><br>
+    <input type="text" placeholder="E-mail" name="NewEmail" required><br><br>
+    <div class="warning"><p>@Html.ValidationMessage("EmailIsTakenError")</p></div>
+    <label for="password"><b>Підтвердіть пароль:</b></label><br>
+    <input type="password" placeholder="Password" name="Password" required><br><br>
+    <div class="warning"><p>@Html.ValidationMessage("PasswordError")</p></div>
+    <button type="submit"> Змінити</button>
+</form>
+<br />
+<a class="btn red" asp-area="" asp-controller="Cabinet" asp-action="Index">
+    Скасувати
+</a>
+<br />

@@ -1,0 +1,135 @@
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+main h2 {
+    margin-top: 2%;
+}
+
+form {
+    width: 30%;
+    margin-top: 5%;
+    margin-bottom: 3%;
+}
+
+button {
+    text-align: center;
+    height: 50px;
+    min-width: fit-content;
+    width: 80%;
+    margin-top: 5px;
+    font-size: 14pt;
+    font-weight: 500;
+    color: #ffffff;
+    background-color: #1a68a6;
+    border-radius: 5px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    border-color: transparent;
+    outline: none;
+    cursor: pointer;
+    padding: 0px 30px;
+}
+
+button:hover {
+    background-color: #023770;
+}
+
+input {
+    margin-top: 3px;
+    height: 40px;
+    width: 100%;
+}
+
+.warning {
+    text-align: center;
+    color: red;
+    margin-bottom: 25px;
+    margin-top: -10px;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 50px;
+    min-width: fit-content;
+    width: calc(24% - 60px);
+    font-size: 14pt;
+    font-weight: 500;
+    color: #ffffff !important;
+    background-color: #1a68a6;
+    border-radius: 5px;
+    border-color: transparent;
+    outline: none;
+    cursor: pointer;
+    margin-bottom: 50px;
+    padding: 0px 30px;
+}
+
+@media (max-width: 650px) {
+    form {
+        width: 90%;
+        margin-top: 12%;
+        margin-bottom: 12%;
+    }
+    .btn {
+        width: calc(72% - 60px);
+    }
+    button {
+        background-color: #1a68a6;
+    }
+
+    button:hover {
+        background-color: #1a68a6;
+    }
+    
+    button:active {
+        background-color: #023770;
+    }
+}
+
+.btn:hover {
+    background-color: #023770;
+    color: #ffffff !important;
+    outline: none;
+}
+
+.red {
+    background-color: red !important;
+}
+
+.red:hover {
+    background-color: darkred !important;
+}
+
+@media (max-width: 650px) {
+    .btn {
+        background-color: #1a68a6;
+    }
+    
+    .btn:hover {
+        background-color: #1a68a6;
+    }
+
+    .btn:active {
+        background-color: #023770;
+    }
+    
+    .red {
+        background-color: red !important;
+    }
+    
+    .red:hover {
+        background-color: red !important;
+    }
+
+    .red:active {
+        background-color: darkred !important;
+    }
+}
