@@ -48,10 +48,10 @@ else
                     @if (Model.IsUserAbleToEdit)
                     {
                         <form id="edit" method="GET" asp-controller="Votings" asp-action="Edit" asp-route-id="@Model.Id">
-                            <button type="submit" class="block gray">Редагувати</button>
+                            <button type="submit" class="block orange">Редагувати</button>
                         </form>
                         <form id="delete" method="GET" asp-controller="Votings" asp-action="Delete" asp-route-id="@Model.Id">
-                            <button type="submit" class="block gray">Видалити</button>
+                            <button type="submit" class="block orange">Видалити</button>
                         </form>
                     }
                     @if (Model.Status == "заявка" || Model.Status == "відмовлено")

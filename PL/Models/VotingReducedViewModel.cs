@@ -14,6 +14,8 @@ namespace PL.Models
 
         public DateTime CreationDate { get; set; }
 
+        public DateTime CompletionDate { get; set; }
+
         public string Status { get; set; }
 
         public bool IsSuccessfulNow { get; set; }

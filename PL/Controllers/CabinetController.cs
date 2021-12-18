@@ -58,7 +58,8 @@ namespace PL.Controllers
                     Status = await _votingService.GetVotingStatusAsync(m),
                     IsSuccessfulNow = await _votingService.IsVotingSuccessfulNowAsync(m),
                     Name = m.Name,
-                    Level = await _votingService.GetVotingLevelAsync(m)
+                    Level = await _votingService.GetVotingLevelAsync(m),
+                    CompletionDate = m.CompletionDate
                 }).Select(t => t.Result); ;
             var profile = new UserProfileViewModel()
             {

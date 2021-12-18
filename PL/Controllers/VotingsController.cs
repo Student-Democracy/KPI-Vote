@@ -76,7 +76,9 @@ namespace PL.Controllers
                 IsSuccessfulNow = await _votingService.IsVotingSuccessfulNowAsync(m),
                 Name = m.Name,
                 Level = await _votingService.GetVotingLevelAsync(m),
-                IsUserAbleToChangeStatus = await IsUserAbleToChangeStatusAsync(m)
+                IsUserAbleToChangeStatus = await IsUserAbleToChangeStatusAsync(m),
+                IsUserAbleToEdit = m.AuthorId == user.Id && m.Status == VotingStatus.NotConfirmed,
+                CompletionDate = m.CompletionDate
             }).Select(t => t.Result);
             return View(model);
         }
@@ -87,6 +89,7 @@ namespace PL.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var model = await _votingService.GetByIdAsync(id);
+            var user = await _userManager.GetUserAsync(User);
             VotingViewModel mappedModel = null;
             if (model != null && await CanUserViewVotingAsync(model))
             {
@@ -109,7 +112,8 @@ namespace PL.Controllers
                     AuthorId = model.AuthorId,
                     StatusSetterId = model.StatusSetterId,
                     IsUserAbleToVote = await IsUserAbleToVoteAsync(model),
-                    IsUserAbleToChangeStatus = await IsUserAbleToChangeStatusAsync(model)
+                    IsUserAbleToChangeStatus = await IsUserAbleToChangeStatusAsync(model),
+                    IsUserAbleToEdit = model.AuthorId == user.Id && model.Status == VotingStatus.NotConfirmed
                 };
                 var author = await _userManager.FindByIdAsync(mappedModel.AuthorId);
                 var statusSetter = await _userManager.FindByIdAsync(mappedModel.StatusSetterId);
@@ -277,22 +281,23 @@ namespace PL.Controllers
             if (model.User is null)
                 model.User = new UserAsAuthorViewModel();
             var user = await _userManager.GetUserAsync(User);
-            var name = user.LastName + " " + user.FirstName;
-            if (!(user.Patronymic is null))
-                name += " " + user.Patronymic;
-            var group = await _groupService.GetByIdAsync(user.GroupId);
-            var flow = await _flowService.GetByIdAsync(group.FlowId);
-            var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
-            var groupName = flow.Name + group.Number;
-            var flowName = flow.Name + 'X';
-            if (!(flow.Postfix is null))
+            
+                var group = await _groupService.GetByIdAsync(user.GroupId);
+            if (!(group is null))
             {
-                groupName += flow.Postfix;
-                flowName += flow.Postfix;
+                var flow = await _flowService.GetByIdAsync(group.FlowId);
+                var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
+                var groupName = flow.Name + group.Number;
+                var flowName = flow.Name + 'X';
+                if (!(flow.Postfix is null))
+                {
+                    groupName += flow.Postfix;
+                    flowName += flow.Postfix;
+                }
+                model.User.Group = groupName;
+                model.User.Flow = flowName;
+                model.User.Faculty = faculty.Name;
             }
-            model.User.Group = groupName;
-            model.User.Flow = flowName;
-            model.User.Faculty = faculty.Name;
             return View(model);
         }
 
@@ -338,9 +343,6 @@ namespace PL.Controllers
                 ModelState.AddModelError("VotingCreationError", exc.Message);
                 if (model.User is null)
                     model.User = new UserAsAuthorViewModel();
-                var name = user.LastName + " " + user.FirstName;
-                if (!(user.Patronymic is null))
-                    name += " " + user.Patronymic;
                 var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
                 var groupName = flow.Name + group.Number;
                 var flowName = flow.Name + 'X';
@@ -357,27 +359,114 @@ namespace PL.Controllers
         }
 
         // GET: VotingsController/Edit/5
-        public ActionResult Edit(int id)
+        [Route("Votings/Edit/{id}")]
+        public async Task<IActionResult> Edit(int id)
         {
-            return View();
+            var model = await _votingService.GetByIdAsync(id);
+            var user = await _userManager.GetUserAsync(User);
+            VotingViewModel mappedModel = null;
+            if (!(model is null) && model.AuthorId == user.Id && model.Status == VotingStatus.NotConfirmed)
+            {
+                mappedModel = new VotingViewModel()
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    MinimalAttendancePercentage = model.MinimalAttendancePercentage,
+                    MinimalForPercentage = model.MinimalForPercentage,
+                    IsUserAbleToEdit = true,
+                    Description = model.Description,
+                    CompletionDate = model.CompletionDate,
+                    CreationDate = model.CreationDate,
+                    VisibilityTerm = model.VisibilityTerm
+                };
+                mappedModel.User = new UserAsAuthorViewModel();
+                var group = await _groupService.GetByIdAsync(user.GroupId);
+                if (!(group is null))
+                {
+                    var flow = await _flowService.GetByIdAsync(group.FlowId);
+                    var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
+                    var groupName = flow.Name + group.Number;
+                    var flowName = flow.Name + 'X';
+                    if (!(flow.Postfix is null))
+                    {
+                        groupName += flow.Postfix;
+                        flowName += flow.Postfix;
+                    }
+                    mappedModel.User.Group = groupName;
+                    mappedModel.User.Flow = flowName;
+                    mappedModel.User.Faculty = faculty.Name;
+                }
+                if (!(model.GroupId is null))
+                    mappedModel.Level = "group";
+                else if (!(model.FlowId is null))
+                    mappedModel.Level = "flow";
+                else if (!(model.FacultyId is null))
+                    mappedModel.Level = "faculty";
+                else
+                    mappedModel.Level = "kpi";
+            }
+            else
+            {
+                ModelState.AddModelError("VotingNotFoundError", "Такого голосування не знайдено або ви не маєте доступу до його редагування");
+            }
+            return View(mappedModel);
         }
 
         // POST: VotingsController/Edit/5
         [HttpPost]
+        [Route("Votings/Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(int id, VotingViewModel model)
         {
+            var existingModel = await _votingService.GetByIdAsync(id);
+            var user = await _userManager.GetUserAsync(User);
+            existingModel.Name = model.Name;
+            existingModel.Description = model.Description;
+            existingModel.CompletionDate = (DateTime)model.CompletionDate;
+            existingModel.VisibilityTerm = (short)model.VisibilityTerm;
+            existingModel.MinimalAttendancePercentage = (decimal)model.MinimalAttendancePercentage;
+            existingModel.MinimalForPercentage = (decimal)model.MinimalForPercentage;
+            var group = await _groupService.GetByIdAsync(user.GroupId);
+            var flow = await _flowService.GetByIdAsync(group.FlowId);
+            switch (model.Level)
+            {
+                case "group":
+                    existingModel.GroupId = user.GroupId;
+                    break;
+                case "flow":
+                    existingModel.FlowId = group.FlowId;
+                    break;
+                case "faculty":
+                    existingModel.FacultyId = flow.FacultyId;
+                    break;
+            }
             try
             {
-                return RedirectToAction(nameof(Index));
+                await _votingService.UpdateAsync(existingModel);
+                return RedirectToAction("Details", "Votings", new { id = existingModel.Id });
             }
-            catch
+            catch (Exception exc)
             {
-                return View();
+                ModelState.AddModelError("VotingEditError", exc.Message);
+                if (model.User is null)
+                    model.User = new UserAsAuthorViewModel();
+                var faculty = await _facultyService.GetByIdAsync(flow.FacultyId);
+                var groupName = flow.Name + group.Number;
+                var flowName = flow.Name + 'X';
+                if (!(flow.Postfix is null))
+                {
+                    groupName += flow.Postfix;
+                    flowName += flow.Postfix;
+                }
+                model.User.Group = groupName;
+                model.User.Flow = flowName;
+                model.User.Faculty = faculty.Name;
             }
+            return View(model);
         }
 
         // GET: VotingsController/Delete/5
+        [Route("Votings/Delete/{id}")]
         public ActionResult Delete(int id)
         {
             return View();
@@ -385,6 +474,7 @@ namespace PL.Controllers
 
         // POST: VotingsController/Delete/5
         [HttpPost]
+        [Route("Votings/Delete/{id}")]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {

@@ -237,6 +237,7 @@ input {
     width: fit-content;
     height: fit-content;
     margin: 0 0;
+    transition: 0.3s linear;
 }
 
 .block:hover {
@@ -258,6 +259,14 @@ input {
 .gray:hover {
     background-color: black;
 }
+
+.orange {
+    background-color: orange;
+}
+
+    .orange:hover {
+        background-color: black;
+    }
 
 .blocks {
     display: flex;
@@ -290,6 +299,14 @@ input {
     }
     
     .gray:active {
+        background-color: black;
+    }
+
+    .orange:hover {
+        background-color: orange;
+    }
+
+    .orange:active {
         background-color: black;
     }
 }
@@ -340,4 +357,48 @@ textarea {
     .red:active {
         background-color: darkred !important;
     }
+}
+
+.cancel {
+    display: block;
+    width: 200px;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    padding: 15px 15px;
+    border-radius: 15px;
+    font-size: 14pt;
+    font-weight: 500;
+    color: #ffffff !important;
+    background-color: #1a68a6;
+    border-color: transparent;
+    outline: none;
+    cursor: pointer;
+    margin-bottom: 50px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+}
+
+    .cancel:hover {
+        background-color: #023770;
+        color: #ffffff !important;
+        outline: none;
+    }
+
+@media (max-width: 650px) {
+    .cancel {
+        width: 90%;
+        background-color: #1a68a6;
+    }
+
+        .cancel:hover {
+            background-color: #1a68a6;
+            color: #ffffff !important;
+        }
+
+        .cancel:active {
+            background-color: #023770;
+            color: #ffffff !important;
+        }
 }

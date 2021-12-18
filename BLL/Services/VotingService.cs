@@ -77,6 +77,8 @@ namespace BLL.Services
             var model = await _context.Votings.FindAsync(id);
             if (model is null)
                 throw new InvalidOperationException("Voting with such an id was not found");
+            if (model.Status != VotingStatus.NotConfirmed)
+                throw new InvalidOperationException("You cannot delete confirmed or banned voting");
             _context.Votings.Remove(model);
             await _context.SaveChangesAsync();
         }
@@ -128,6 +130,8 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Model's author id cannot be null or empty");
             if (await _context.Users.FindAsync(model.AuthorId) is null)
                 throw new InvalidOperationException("Author with such an id was not found");
+            if (existingModel.Status != VotingStatus.NotConfirmed)
+                throw new InvalidOperationException("You cannot change confirmed or banned voting");
             existingModel = _mapper.Map(model, existingModel);
             _context.Votings.Update(existingModel);
             await _context.SaveChangesAsync();
