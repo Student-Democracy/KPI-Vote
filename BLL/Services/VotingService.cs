@@ -19,7 +19,7 @@ namespace BLL.Services
 
         private readonly IMapper _mapper;
 
-        private const short _minDescriptionLength = 400;
+        private const short _minDescriptionLength = 1000;
 
         private const short _maxNameLength = 250;
 
@@ -44,8 +44,9 @@ namespace BLL.Services
                     nameof(model));
             if (string.IsNullOrEmpty(model.Description))
                 throw new ArgumentNullException(nameof(model), "Model's description cannot be null or empty");
-            if (model.Description.Length < _minDescriptionLength)
-                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters",
+            var realLength = model.Description.Trim().Length;
+            if (realLength < _minDescriptionLength)
+                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters in the start and in the end. It was {realLength}",
                     nameof(model));
             if (model.MinimalForPercentage < _minForPercentage || model.MinimalForPercentage > 100)
                 throw new ArgumentException($"Model's minimal for percentage cannot be less than {_minForPercentage} or bigger than 100", 
@@ -98,8 +99,9 @@ namespace BLL.Services
                     nameof(model));
             if (string.IsNullOrEmpty(model.Description))
                 throw new ArgumentNullException(nameof(model), "Model's description cannot be null or empty");
-            if (model.Description.Length < _minDescriptionLength)
-                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters",
+            var realLength = model.Description.Trim().Length;
+            if (realLength < _minDescriptionLength)
+                throw new ArgumentException($"Model's description should contain at least {_minDescriptionLength} characters in the start and in the end. It was {realLength}",
                     nameof(model));
             if (model.MinimalForPercentage < _minForPercentage || model.MinimalForPercentage > 100)
                 throw new ArgumentException($"Model's minimal for percentage cannot be less than or equal {_minForPercentage} or greater than 100",

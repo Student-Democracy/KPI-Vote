@@ -80,6 +80,16 @@ namespace UnitTests.BLLTests
                 "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam." +
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam." +
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
                 "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam.",
                 MinimalForPercentage = 55m,
                 CompletionDate = DateTime.Now.AddDays(30),
@@ -170,6 +180,17 @@ namespace UnitTests.BLLTests
             {
                 Name = "Sample one",
                 Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam."
+                + "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam."
+                +
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
                 "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
@@ -383,6 +404,17 @@ namespace UnitTests.BLLTests
                 Id = context.Votings.FirstOrDefault(v => v.Name == "Voting 1").Id,
                 Name = "Not the Voting 1",
                 Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam."
+                + "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam." +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam."
+                + "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
                 "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
@@ -720,7 +752,12 @@ namespace UnitTests.BLLTests
             var votingModel = new VotingModel()
             {
                 Id = context.Votings.FirstOrDefault(v => v.Name == "Voting 1").Id,
-                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " + "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " + "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " + "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " + "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam." + "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
+                "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
+                "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
+                "Nullam dignissim, leo eu pretium viverra, risus elit bibendum nisi, ac nam."
+                + "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
                 "Integer vel sem quis tortor pretium placerat. Pellentesque habitant morbi " +
                 "tristique senectus et netus et malesuada fames ac turpis egestas. In semper porta iaculis. " +
                 "Cras accumsan, eros ut imperdiet finibus, elit mauris aliquam risus, in vehicula diam urna quis metus. " +
