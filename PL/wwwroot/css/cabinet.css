@@ -99,3 +99,8 @@ td:nth-child(even) {
 .votings {
     width: 80%;
 }
+
+.notification {
+    color: green;
+    text-align: left;
+}

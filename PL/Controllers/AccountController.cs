@@ -93,5 +93,42 @@ namespace PL.Controllers
             }
             return View();
         }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (model.NewPassword == model.NewPasswordConfirm)
+            {
+                if (!await _userManager.CheckPasswordAsync(user, model.Password))
+                {
+                    ModelState.AddModelError("PasswordError", "Неправильний пароль");
+                }
+                else
+                {
+                    var result = await _userManager.ChangePasswordAsync(user, model.Password, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        TempData["Message"] = "Пароль було змінено успішно";
+                        return RedirectToAction("Index", "Cabinet");
+                    }
+                    else
+                        ModelState.AddModelError("NewPasswordError", "Пароль неналежного формату (принаймні, 8 символів, з яких 1 цифра, 1 велика та 1 мала літери)");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("NewPasswordConfirmError", "Новий пароль та його підтвердження відрізняються");
+            }
+            return View();
+        }
     }
 }

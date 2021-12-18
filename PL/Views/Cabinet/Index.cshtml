@@ -10,6 +10,10 @@
 }
 
 <h2>Особистий кабінет</h2>
+@if (!(TempData["Message"] is null))
+{
+    <p class="notification">Повідомлення: @TempData["Message"]</p>
+}
 <table>
     <tr>
         <td>ПІБ:</td>
