@@ -461,6 +461,7 @@ namespace PL.Controllers
                 model.User.Group = groupName;
                 model.User.Flow = flowName;
                 model.User.Faculty = faculty.Name;
+                model.CreationDate = existingModel.CreationDate;
             }
             return View(model);
         }

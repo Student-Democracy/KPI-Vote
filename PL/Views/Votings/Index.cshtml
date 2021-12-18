@@ -59,8 +59,6 @@
                 <p>Рівень: @voting.Level</p>
             </div>
             <div class="voting-reduced-right">
-                @if (voting.IsUserAbleToChangeStatus)
-                {
                 <div class="blocks small">
                     @if (voting.IsUserAbleToEdit)
                     {
@@ -71,28 +69,33 @@
                             <button type="submit" class="block orange">Видалити</button>
                         </form>
                     }
-                    @if (voting.Status == "заявка" || voting.Status == "відмовлено")
+                    @if (voting.IsUserAbleToChangeStatus)
                     {
-                        <form id="approve" method="POST" asp-controller="Votings" asp-action="Approve">
-                            <input type="hidden" name="id" value="@voting.Id">
-                            <button type="submit" class="block blue">Затвердити</button>
-                        </form>
-                    }
-                    @if (voting.Status != "відмовлено")
-                    {
-                        <form id="block" method="POST" asp-controller="Votings" asp-action="Block">
-                            <input type="hidden" name="id" value="@voting.Id">
-                            <button type="submit" class="block gray">Заблокувати</button>
-                        </form>
+
+
+                        @if (voting.Status == "заявка" || voting.Status == "відмовлено")
+                        {
+                            <form id="approve" method="POST" asp-controller="Votings" asp-action="Approve">
+                                <input type="hidden" name="id" value="@voting.Id">
+                                <button type="submit" class="block blue">Затвердити</button>
+                            </form>
+                        }
+                        @if (voting.Status != "відмовлено")
+                        {
+                            <form id="block" method="POST" asp-controller="Votings" asp-action="Block">
+                                <input type="hidden" name="id" value="@voting.Id">
+                                <button type="submit" class="block gray">Заблокувати</button>
+                            </form>
+                        }
+
                     }
                 </div>
-                }
-                @{
-                    var percentageColor = (voting.IsSuccessfulNow) ? "green" : "red";
-                }
-                <h3 style="color: @percentageColor;">@string.Format("{0:0.0}", voting.ForPercentage)%</h3>
-                <p>Статус: @voting.Status</p>
-            </div>
+                    @{
+                        var percentageColor = (voting.IsSuccessfulNow) ? "green" : "red";
+                    }
+                    <h3 style="color: @percentageColor;">@string.Format("{0:0.0}", voting.ForPercentage)%</h3>
+                    <p>Статус: @voting.Status</p>
+                </div>
         </div>
     }
 </div>

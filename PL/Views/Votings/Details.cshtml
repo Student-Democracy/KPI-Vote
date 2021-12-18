@@ -42,8 +42,6 @@ else
                 }
             </div>
             <div class="voting-main-right">
-                @if (Model.IsUserAbleToChangeStatus)
-                {
                 <div class="blocks">
                     @if (Model.IsUserAbleToEdit)
                     {
@@ -54,32 +52,36 @@ else
                             <button type="submit" class="block orange">Видалити</button>
                         </form>
                     }
-                    @if (Model.Status == "заявка" || Model.Status == "відмовлено")
+                    @if (Model.IsUserAbleToChangeStatus)
                     {
-                        <form id="approve" method="POST" asp-controller="Votings" asp-action="Approve">
-                            <input type="hidden" name="id" value="@Model.Id">
-                            <button type="submit" class="block blue">Затвердити</button>
-                        </form>
-                    }
-                    @if (Model.Status != "відмовлено")
-                    {
-                        <form id="block" method="POST" asp-controller="Votings" asp-action="Block">
-                            <input type="hidden" name="id" value="@Model.Id">
-                            <button type="submit" class="block gray">Заблокувати</button>
-                        </form>
+
+                        @if (Model.Status == "заявка" || Model.Status == "відмовлено")
+                        {
+                            <form id="approve" method="POST" asp-controller="Votings" asp-action="Approve">
+                                <input type="hidden" name="id" value="@Model.Id">
+                                <button type="submit" class="block blue">Затвердити</button>
+                            </form>
+                        }
+                        @if (Model.Status != "відмовлено")
+                        {
+                            <form id="block" method="POST" asp-controller="Votings" asp-action="Block">
+                                <input type="hidden" name="id" value="@Model.Id">
+                                <button type="submit" class="block gray">Заблокувати</button>
+                            </form>
+                        }
+
                     }
                 </div>
-                }
-                @{
-                    var percentageColor = (Model.IsSuccessfulNow) ? "green" : "red";
-                }
-                <h3 style="color: @percentageColor;">ЗА: @string.Format("{0:0.0}", Model.ForPercentage)%</h3>
-                <p>ЗА/Всього: @Model.VotesFor/@Model.VotesTotally</p>
-                <p>Необхідно набрати ЗА: @string.Format("{0:0.0}", Model.MinimalForPercentage)%</p>
-                <p>Явка: @string.Format("{0:0.0}", Model.AttendancePercentage)%</p>
-                <p>Необхідна явка: @string.Format("{0:0.0}", Model.MinimalAttendancePercentage)%</p>
-                <p>Статус: @Model.Status</p>
-            </div>
+                    @{
+                        var percentageColor = (Model.IsSuccessfulNow) ? "green" : "red";
+                    }
+                    <h3 style="color: @percentageColor;">ЗА: @string.Format("{0:0.0}", Model.ForPercentage)%</h3>
+                    <p>ЗА/Всього: @Model.VotesFor/@Model.VotesTotally</p>
+                    <p>Необхідно набрати ЗА: @string.Format("{0:0.0}", Model.MinimalForPercentage)%</p>
+                    <p>Явка: @string.Format("{0:0.0}", Model.AttendancePercentage)%</p>
+                    <p>Необхідна явка: @string.Format("{0:0.0}", Model.MinimalAttendancePercentage)%</p>
+                    <p>Статус: @Model.Status</p>
+                </div>
         </div>
         <div class="description">
             <h4>Опис:</h4><br>
