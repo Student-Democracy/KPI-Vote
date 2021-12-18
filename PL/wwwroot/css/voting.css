@@ -124,7 +124,8 @@ label {
 }
 
 button {
-    width: 200px;
+    min-width: 150px;
+    width: fit-content;
     margin-top: 15px;
     margin-bottom: 30px;
     padding: 15px 15px;
@@ -228,6 +229,7 @@ input {
 }
 
 .block {
+    min-width: unset;
     background-color: #1a68a6;
     color: white !important;
     font-weight: 600;
@@ -330,7 +332,7 @@ textarea {
     font-family: 'Open Sans', sans-serif;
 }
 
-.add-voting > button {
+.edit-voting > button {
     margin-left: 50%;
     transform: translateX(-50%);
 }
@@ -361,7 +363,8 @@ textarea {
 
 .cancel {
     display: block;
-    width: 200px;
+    min-width: 150px;
+    width: fit-content;
     margin-top: 15px;
     margin-bottom: 30px;
     padding: 15px 15px;

@@ -60,7 +60,7 @@ $(forPercentage).keyup(function () {
     drawOutline(this, validateFloat(this, minFor, max));
 });
 
-$('#add-voting').submit(function (event) {
+$('#edit-voting').submit(function (event) {
     let chars = $('#description').val().trim().length;
     if (chars < 1000) {
         event.preventDefault();
