@@ -399,6 +399,10 @@ namespace UnitTests.BLLTests
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
             var service = new VotingService(context, _mapper);
+            var voting = context.Votings.FirstOrDefault(v => v.Name == "Voting 1");
+            voting.Status = VotingStatus.NotConfirmed;
+            context.Votings.Update(voting);
+            await context.SaveChangesAsync();
             var votingModel = new VotingModel()
             {
                 Id = context.Votings.FirstOrDefault(v => v.Name == "Voting 1").Id,
@@ -864,6 +868,10 @@ namespace UnitTests.BLLTests
         {
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var voting = await context.Votings.FindAsync(id);
+            voting.Status = VotingStatus.NotConfirmed;
+            context.Votings.Update(voting);
+            await context.SaveChangesAsync();
             var service = new VotingService(context, _mapper);
             var expectedCount = context.Votings.Count() - 1;
 
