@@ -42,7 +42,7 @@ else
                 }
             </div>
             <div class="voting-main-right">
-                <div class="blocks">
+                <div class="blocks voting-blocks">
                     @if (Model.IsUserAbleToEdit)
                     {
                         <form id="edit" method="GET" asp-controller="Votings" asp-action="Edit" asp-route-id="@Model.Id">
