@@ -27,19 +27,25 @@ namespace PL.Controllers
 
         private readonly IVotingService _votingService;
 
-        public CabinetController(UserManager<User> userManager, IGroupService groupService, IFlowService flowService, IFacultyService facultyService, IVotingService votingService)
+        private readonly IBlockService _blockService;
+
+        public CabinetController(UserManager<User> userManager, IGroupService groupService, IFlowService flowService, IFacultyService facultyService, IVotingService votingService, IBlockService blockService)
         {
             _userManager = userManager;
             _groupService = groupService;
             _flowService = flowService;
             _facultyService = facultyService;
             _votingService = votingService;
+            _blockService = blockService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
+            var ban = await _blockService.GetByUserIdAsync(user.Id);
+            if (!(ban is null))
+                return RedirectToAction("Banned", "Account");
             var name = user.LastName + " " + user.FirstName;
             if (!(user.Patronymic is null))
                 name += " " + user.Patronymic;

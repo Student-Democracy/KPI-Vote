@@ -1,4 +1,5 @@
-﻿using DAL.Entities;
+﻿using BLL.Interfaces;
+using DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -17,21 +18,30 @@ namespace PL.Controllers
 
         private readonly UserManager<User> _userManager;
 
-        public AccountController(SignInManager<User> signInManager, UserManager<User> userManager = null)
+        private readonly IBlockService _blockService;
+
+        public AccountController(SignInManager<User> signInManager, UserManager<User> userManager, IBlockService blockService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _blockService = blockService;
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (!(user is null))
+                return RedirectToAction("Index", "Cabinet");
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (!(user is null))
+                return RedirectToAction("Index", "Cabinet");
             if (ModelState.IsValid)
             {
                 var result =
@@ -140,6 +150,30 @@ namespace PL.Controllers
                 ModelState.AddModelError("NewPasswordConfirmError", "Новий пароль та його підтвердження відрізняються");
             }
             return View();
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Banned()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var ban = await _blockService.GetByUserIdAsync(user.Id);
+            if (ban is null)
+                return RedirectToAction("Index", "Cabinet");
+            await _signInManager.SignOutAsync();
+            var admin = await _userManager.FindByIdAsync(ban.AdminId);
+                var adminName = admin.LastName + " " + admin.FirstName;
+                if (!(admin.Patronymic is null))
+                    adminName += " " + admin.Patronymic;
+                var model = new BanReducedViewModel()
+                {
+                    DateTo = ban.DateTo,
+                    Hammer = ban.Hammer,
+                    AdminEmail = admin.Email,
+                    AdminTelegramTag = admin.TelegramTag,
+                    AdminName = adminName
+                };
+            return View(model);
         }
     }
 }
