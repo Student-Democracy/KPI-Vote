@@ -8,7 +8,8 @@ namespace DAL.Entities
     {
         Denied = -1,
         NotConfirmed = 0,
-        Confirmed = 1
+        Confirmed = 1,
+        Completed = 2
     }
 
     public class Voting
@@ -21,8 +22,6 @@ namespace DAL.Entities
         public string Description { get; set; }
 
         public decimal MinimalForPercentage { get; set; }
-
-        public decimal MinimalAttendancePercentage { get; set; }
 
         public DateTime CreationDate { get; set; }
 
@@ -42,13 +41,13 @@ namespace DAL.Entities
         [InverseProperty("StatusSettedVotings")]
         public User StatusSetter { get; set; }
 
-        public int? FacultyId { get; set; }
+        public int FacultyId { get; set; }
         public Faculty Faculty { get; set; }
 
-        public int? FlowId { get; set; }
+        public int FlowId { get; set; }
         public Flow Flow { get; set; }
 
-        public int? GroupId { get; set; }
+        public int GroupId { get; set; }
         public Group Group { get; set; }
 
 

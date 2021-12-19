@@ -24,7 +24,5 @@ namespace DAL.Entities
         [ForeignKey("AdminId")]
         [InverseProperty("GivenBans")]
         public User Admin { get; set; }
-        public DateTime CreationDate { get; set; }
-        public int FlowId { get; set; }
     }
 }
