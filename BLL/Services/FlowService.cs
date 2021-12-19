@@ -54,7 +54,7 @@ namespace BLL.Services
             if (model.Name.Length > _maxNameLength)
                 throw new ArgumentException($"Model's name cannot contain more than {_maxNameLength} characters",
                     nameof(model));
-            if (model.Postfix.Length > 2)
+            if (!(model.Postfix is null) && model.Postfix.Length > 2)
                 throw new ArgumentNullException(nameof(model), "Postfix cannot be longer than 2 symbols");
             var existingModel = await _context.Flows.FindAsync(model.Id);
             if (!(existingModel is null) && model.CreationDate != existingModel.CreationDate)

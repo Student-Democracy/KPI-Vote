@@ -47,7 +47,7 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Model's user id cannot be null or empty");
             if (await _context.Users.FindAsync(model.UserId) is null)
                 throw new ArgumentNullException(nameof(model), "User with such an id was not found");
-            if (!(await _context.Bans.SingleOrDefaultAsync(p => p.UserId == model.UserId) is null))
+            if (!(await GetByUserIdAsync(model.UserId) is null))
                 throw new ArgumentException("This user is already blocked", nameof(model)); 
             if (string.IsNullOrEmpty(model.AdminId))
                 throw new ArgumentNullException(nameof(model), "Model's admin id cannot be null or empty");
@@ -115,8 +115,7 @@ namespace BLL.Services
                 throw new ArgumentNullException("Model's user id cannot be null or empty");
             if (await _context.Users.FindAsync(userId) is null)
                 throw new ArgumentNullException("User with such an id was not found");
-
-            return _mapper.Map<BlockModel>(await _context.Bans.SingleOrDefaultAsync(p => p.UserId == userId && p.DateTo>=DateTime.Now));
+            return _mapper.Map<BlockModel>(await _context.Bans.SingleOrDefaultAsync(p => p.UserId == userId && p.DateTo >= DateTime.Now));
         }
 
         public async Task<IEnumerable<BlockModel>> GetSortedByAdminIdAsync(string adminId)

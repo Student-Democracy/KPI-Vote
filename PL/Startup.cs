@@ -73,7 +73,7 @@ namespace PL
                 await next();
                 if (context.Response.StatusCode == 404)
                 {
-                    context.Request.Path = "/Home/NotFound";
+                    context.Request.Path = "/Home/NotFoundPage";
                     await next();
                 }
             });
