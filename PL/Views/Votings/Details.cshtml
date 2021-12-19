@@ -1,0 +1,129 @@
+﻿@model VotingViewModel
+@{
+    ViewData["Title"] = "Голосування";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/voting.css" />
+}
+
+<h2>Голосування</h2>
+<br>
+@if (Model is null)
+{
+    <p>@Html.ValidationMessage("VotingNotFoundError")</p>
+}
+else
+{
+    var globalColor = "#1a68a6";
+    if (Model.Status == "відмовлено")
+        globalColor = "black";
+    else if (Model.Status == "заявка")
+        globalColor = "orange";
+    else if (Model.Status == "завершено; успішне")
+        globalColor = "green";
+    else if (Model.Status == "завершено; неуспішне")
+        globalColor = "red";
+    <div style="border-color: @globalColor;" class="voting">
+        <h3>@Model.Name</h3>
+        <div class="voting-main">
+            <div class="voting-main-left">
+                <p>Зареєстровано: @Model.CreationDate</p>
+                <p>Продовжиться до: @Model.CompletionDate</p>
+                <p>Рівень: @Model.Level</p>
+                <br><p>Автор: <a asp-area="" asp-controller="UsersPage" asp-action="UserProfileReader" asp-route-id ="@Model.AuthorId">@Model.Author</a></p>
+                @if (!(Model.StatusSetter is null))
+                {
+                    <p>Перевірив: <a asp-area="" asp-controller="UsersPage" asp-action="UserProfileReader" asp-route-id ="@Model.StatusSetterId">@Model.StatusSetter</a></p>
+                }
+                else
+                {
+                    <p>Ще не перевірено</p>
+                }
+            </div>
+            <div class="voting-main-right">
+                <div class="blocks voting-blocks">
+                    @if (Model.IsUserAbleToEdit)
+                    {
+                        <form id="edit" method="GET" asp-controller="Votings" asp-action="Edit" asp-route-id="@Model.Id">
+                            <button type="submit" class="block orange">Редагувати</button>
+                        </form>
+                        <form id="delete" method="GET" asp-controller="Votings" asp-action="Delete" asp-route-id="@Model.Id">
+                            <button type="submit" class="block orange">Видалити</button>
+                        </form>
+                    }
+                    @if (Model.IsUserAbleToChangeStatus)
+                    {
+
+                        @if (Model.Status == "заявка" || Model.Status == "відмовлено")
+                        {
+                            <form id="approve" method="POST" asp-controller="Votings" asp-action="Approve">
+                                <input type="hidden" name="id" value="@Model.Id">
+                                <button type="submit" class="block blue">Затвердити</button>
+                            </form>
+                        }
+                        @if (Model.Status != "відмовлено")
+                        {
+                            <form id="block" method="POST" asp-controller="Votings" asp-action="Block">
+                                <input type="hidden" name="id" value="@Model.Id">
+                                <button type="submit" class="block gray">Заблокувати</button>
+                            </form>
+                        }
+
+                    }
+                </div>
+                    @{
+                        var percentageColor = (Model.IsSuccessfulNow) ? "green" : "red";
+                    }
+                    <h3 style="color: @percentageColor;">ЗА: @string.Format("{0:0.0}", Model.ForPercentage)%</h3>
+                    <p>ЗА/Всього: @Model.VotesFor/@Model.VotesTotally</p>
+                    <p>Необхідно набрати ЗА: @string.Format("{0:0.0}", Model.MinimalForPercentage)%</p>
+                    <p>Явка: @string.Format("{0:0.0}", Model.AttendancePercentage)%</p>
+                    <p>Необхідна явка: @string.Format("{0:0.0}", Model.MinimalAttendancePercentage)%</p>
+                    <p>Статус: @Model.Status</p>
+                </div>
+        </div>
+        <div class="description">
+            <h4>Опис:</h4><br>
+            <p>@Model.Description</p>
+        </div>
+        <br>
+        <div class="vote">
+            <h4>Голосувати</h4>
+            <p>@Html.ValidationMessage("VoteError")</p>
+            @if (!(Model.UserVote is null))
+            {
+                var voteColor = "black";
+                if (Model.UserVote == "ЗА")
+                    voteColor = "green";
+                else if (Model.UserVote == "ПРОТИ")
+                    voteColor = "red";
+                <p>Ви проголосували: <span style="color: @voteColor;">@Model.UserVote</span></p>
+                <p>Дякуємо!</p>
+            }
+            else if (Model.Status == "активно")
+            {
+                @if (Model.IsUserAbleToVote)
+                {
+                    <form method="POST" asp-route="Votings/{id}">
+                        <input type="radio" id="FOR" name="UserVote" value="ЗА" class="for">
+                        <label for="FOR" class="for">ЗА</label><br>
+                        <input type="radio" id="AGAINST" name="UserVote" value="ПРОТИ" class="against">
+                        <label for="AGAINST" class="against">ПРОТИ</label><br>
+                        <input type="radio" id="NEUTRAL" name="UserVote" value="Нейтрально" required>
+                        <label for="NEUTRAL">Нейтрально</label><br>
+                        <button type="submit">Проголосувати</button>
+                    </form>
+                }
+                else
+                {
+                    <p>Ви не можете проголосувати, тому що не належите до цієї групи/потоку/факультету</p>
+                }
+            }
+            else
+            {
+                <p>На жаль, голосування не є активним, тому проголосувати не можна</p>
+            }
+        </div>
+    </div>
+}

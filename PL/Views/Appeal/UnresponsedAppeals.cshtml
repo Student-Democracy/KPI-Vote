@@ -1,0 +1,32 @@
+﻿@model IEnumerable<AppealViewModel>
+
+@{
+    ViewData["Title"] = "Звернення без відповіді";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/appeal.css" />
+}
+
+<div class="appeals">
+    @{
+        foreach (var appeal in Model)
+        {
+            <div class="appeal_item">
+                <div class="appeal-top">
+                    <div class="message">@appeal.Message</div>
+                    <div class="buttons">
+                        <a class="respond" asp-controller="Appeal" asp-action="RespondAppeal" asp-route-id="@appeal.Id">respond</a>
+                        <a class="delete" asp-controller="Appeal" asp-action="DeleteAppealByAdmin" asp-route-id="@appeal.Id">delete</a>
+                    </div>
+                </div>
+
+                <hr>
+                <div>Тема звернення: @PL.Data.AppealThemes.Themes[appeal.Importance-1]</div>
+                <div class="person">Створив: @appeal.User</div>
+                <div class="date">Дата створення: @appeal.CreationDate</div>
+            </div>
+        }
+    }
+
+</div>
