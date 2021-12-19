@@ -1,0 +1,22 @@
+﻿@model AppealViewModel
+
+@{
+    ViewData["Title"] = "Відповісти на звернення";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/appeal.css" />
+}
+
+<form method="post" class="appeal_item" asp-controller="Appeal" asp-action="RespondAppeal">
+    <div class="appeal-top">
+        <div class="message">@Model.Message</div>
+    </div>
+    
+    <hr>
+    <textarea class="text-field" asp-for="Response"></textarea>
+    <div class="warning"><p>@Html.ValidationMessage("EmptyResponse")</p></div>
+    <div class="person">Створив: @Model.User</div>
+    <div class="date">Дата створення: @Model.CreationDate</div>
+    <input type="submit" class="edit-btn" value="Відповісти">
+</form>

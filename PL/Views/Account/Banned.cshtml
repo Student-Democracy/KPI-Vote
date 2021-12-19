@@ -1,0 +1,34 @@
+﻿@model PL.Models.BanReducedViewModel
+
+@{
+    ViewData["Title"] = "Бан";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/banneduserstyle.css" />
+}
+
+<div class="banned">
+    <h2>Увага!</h2>
+    <p>Ваш акаунт було заблоковано до @Model.DateTo через причину "@Model.Hammer" адміністратором @Model.AdminName.</p>
+    <br />
+    <p>Зв'язок із адміністратором:</p>
+    <table class="admin-links">
+        <tr>
+            <td>
+                E-mail
+            </td>
+            <td>
+                <a href="mailto:@Model.AdminEmail">@Model.AdminEmail</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Telegram
+            </td>
+            <td>
+                <a href="https://t.me/@Model.AdminTelegramTag.Substring(1)">@Model.AdminTelegramTag</a>
+            </td>
+        </tr>
+    </table>
+</div>
