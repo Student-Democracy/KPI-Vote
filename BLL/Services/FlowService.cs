@@ -60,6 +60,7 @@ namespace BLL.Services
             if (!(existingModel is null) && model.CreationDate != existingModel.CreationDate)
                 throw new ArgumentException("The creation date cannot be changed", nameof(model));
             existingModel = _mapper.Map(model, existingModel);
+            
             _context.Flows.Update(existingModel);
             await _context.SaveChangesAsync();
         }

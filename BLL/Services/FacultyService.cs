@@ -20,6 +20,13 @@ namespace BLL.Services
 
         private const short _maxNameLength = 250;
 
+        public FacultyService(ApplicationContext context, IMapper mapper)
+        {
+            _context = context ?? throw new ArgumentNullException(nameof(context), "Context cannot be null");
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper), "Mapper cannot be null");
+        }
+
+
         public IEnumerable<FacultyModel> GetAll()
         {
             return _mapper.Map<IEnumerable<FacultyModel>>(_context.Faculties);
@@ -28,12 +35,6 @@ namespace BLL.Services
         public async Task<FacultyModel> GetByIdAsync(int id)
         {
             return _mapper.Map<FacultyModel>(await _context.Faculties.SingleOrDefaultAsync(v => v.Id == id));
-        }
-
-        public FacultyService(ApplicationContext context, IMapper mapper)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context), "Context cannot be null");
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper), "Mapper cannot be null");
         }
 
         public async Task AddAsync(FacultyModel model)
@@ -53,9 +54,7 @@ namespace BLL.Services
                 throw new ArgumentNullException(nameof(model), "Model's name cannot be null or empty");
             if (model.Name.Length > _maxNameLength)
                 throw new ArgumentException($"Model's name cannot contain more than {_maxNameLength} characters",
-                    nameof(model));
-            if (model.Postfix.Length > 2)
-                throw new ArgumentNullException(nameof(model), "Postfix cannot be longer than 2 symbols");
+                    nameof(model));           
             var existingModel = await _context.Faculties.FindAsync(model.Id);
             if (!(existingModel is null) && model.CreationDate != existingModel.CreationDate)
                 throw new ArgumentException("The creation date cannot be changed", nameof(model));

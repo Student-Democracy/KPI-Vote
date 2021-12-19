@@ -1,0 +1,47 @@
+﻿@using System.Globalization;
+
+
+@model GroupViewModel
+
+@{
+    ViewData["Title"] = "Створити групу";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/users-page2.css" />
+}
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="~/js/show-list-script.js"></script>
+}
+
+<h2>Створити групу</h2>
+<br>
+<div style="border-color: orange;" class="blocking">
+    <form id="block-user" class="block-user" method="POST">
+        <br />
+        <label>Створіть групу, вибравши потік, якому вона належить. Наприклад, ІС-0/мп.</label><br>
+
+        <br />
+        <label for="FlowName">
+            Назва потоку:
+            <select name="FlowName" required>
+                @if (Model.FlowName is null)
+                {
+                    <option disabled selected label="Оберіть"></option>
+                }
+                @{
+                    foreach (var flow in Model.Flows)
+                    {
+                        <option value="@flow.Name" selected="@Model.FlowName">@flow.Name/@flow.Postfix</option>
+                    }
+                }
+            </select>
+        </label>
+        
+        <br /><br />
+        <button type="submit">Створити групу</button>
+    </form>
+</div>
+

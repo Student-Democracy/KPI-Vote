@@ -1,10 +1,12 @@
 ﻿using DAL.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace BLL.Models
+namespace PL.Models
 {
-    public class FlowModel
+    public class FlowViewModel
     {
         public int Id { get; set; }
 
@@ -12,12 +14,10 @@ namespace BLL.Models
 
         public string Postfix { get; set; }
 
-        public DateTime CreationDate { get; set; }
-
         public int FacultyId { get; set; }
 
-        public ICollection<int> GroupIds { get; set; }
+        public string FacultyNameChoose { get; set; }
 
-        public ICollection<int> VotingIds { get; set; }
+        public List<string> Faculties { get; set; }
     }
 }

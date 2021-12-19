@@ -1,0 +1,88 @@
+﻿@using System.Globalization;
+
+
+@model FlowViewModel
+
+@{
+    ViewData["Title"] = "Створити потік";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/users-page2.css" />
+}
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="~/js/show-list-script.js"></script>
+}
+
+<h2>Створити потік</h2>
+<br>
+<div style="border-color: orange;" class="blocking">
+    <form id="block-user" class="block-user" method="POST">
+        <br />
+        <label>Створіть потік, ввівши його абревіатуру. Наприклад, ІС-0.</label><br>
+        <br />
+        <label for="Name">
+            Назва потоку:
+            <input type="text" name="Name" value="" required>
+        </label>
+        <br />
+        <br />
+        <label>Створіть потік, вибравши його постфікс. Наприклад, мп, мн або ф. Або ж нічого.</label><br>
+
+        <br />
+        <label for="Postfix">
+            Постфікс:
+            <select name="Postfix" required>
+                @{
+                    var isSelected = false;
+                }
+                @if (Model.Postfix is null)
+                {
+                    <option disabled selected label="Оберіть"></option>
+                }
+                else
+                {
+                    isSelected = Model.Postfix == "";
+                }
+                <option value="" selected="@isSelected"></option>
+                @{
+                    isSelected = Model.Postfix == "мп";
+                }
+                <option value="мп" selected="@isSelected">мп</option>
+                @{
+                    isSelected = Model.Postfix == "мн";
+                }
+                <option value="мн" selected="@isSelected">мн</option>
+                @{
+                    isSelected = Model.Postfix == "ф";
+                }
+                <option value="ф" selected="@isSelected">ф</option>
+            </select>
+        </label>
+        <br />
+        <br />
+        <label>Створіть потік, вибравши факультет, якому він належить. Наприклад, ФІОТ.</label><br>
+
+        <br />
+        <label for="FacultyNameChoose">
+            Назва факультету:
+            <select name="FacultyNameChoose" required>
+                @if (Model.FacultyNameChoose is null)
+                {
+                    <option disabled selected label="Оберіть"></option>
+                }
+                @{
+                    foreach (var faculty in Model.Faculties)
+                    {
+                        <option value="@faculty" selected="@Model.FacultyNameChoose">@faculty</option>
+                    }
+                }
+            </select>
+        </label>
+        <br /><br />
+        <button type="submit">Створити потік</button>
+    </form>
+</div>
+
