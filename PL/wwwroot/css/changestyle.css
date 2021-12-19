@@ -133,3 +133,7 @@ input {
         background-color: darkred !important;
     }
 }
+
+.validate-password {
+    color: red;
+}
