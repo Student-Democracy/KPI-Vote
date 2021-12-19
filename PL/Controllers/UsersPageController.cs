@@ -125,11 +125,18 @@ namespace PL.Controllers
             var facultiesGotten = _facultyService.GetAll().ToList();
             List<string> _facultiesName = new List<string>();
             var flow = new FlowViewModel();
+            var groups = _groupService.GetAll();
+            var author = await _userManager.GetUserAsync(User);
+            var flows = _flowService.GetAll();
+            flow.Flows = flows;
+            flow.Author = author;
+            flow.Groups = groups;
             for(int i = 0; i<facultiesGotten.Count; i++)
             {
                 _facultiesName.Add(facultiesGotten[i].Name);
             }
             flow.Faculties = _facultiesName;
+            flow.FacultiesIds = facultiesGotten;
             return View(flow);
         }
 
@@ -163,7 +170,11 @@ namespace PL.Controllers
         {
             var flows = _flowService.GetAll();
             var group = new GroupViewModel();
+            var author = await _userManager.GetUserAsync(User);
+            var groups = _groupService.GetAll();
+            group.Author = author;
             group.Flows = flows;
+            group.Groups = groups;
             return View(group);
         }
 
@@ -226,6 +237,8 @@ namespace PL.Controllers
             var groups = _groupService.GetAll();
             var flows = _flowService.GetAll();
             var userRegistration = new UserRegistrationViewModel();
+            var author = await _userManager.GetUserAsync(User);
+            userRegistration.Author = author;
             userRegistration.Groups = groups;
             userRegistration.Flows = flows;
             return View(userRegistration);
@@ -292,6 +305,59 @@ namespace PL.Controllers
             return RedirectToAction("Index", "UsersPage");
         }
 
+        [HttpGet]
+        [Route("UsersPage/UserProfileReader")]
+        public async Task<IActionResult> UserProfileReader(string id)
+        {
+            var user = _context.Users.SingleOrDefault(u => u.Id == id);
+            var userProfile = new UserProfileViewModel();
+            userProfile.Name = user.LastName + " " + user.FirstName + " " + user.Patronymic;
+            userProfile.TelegramTag = user.TelegramTag;
+            userProfile.Email = user.Email;
+            string groupName = "";
+            string facultyName = "";
+            var groups = _groupService.GetAll();
+            var flows = _flowService.GetAll();
+            var faculties = _facultyService.GetAll().ToList();
+            foreach (var group in groups)
+            {
+                if(group.Id == user.GroupId)
+                {
+                    foreach(var flow in flows)
+                    {
+                        if(flow.Id == group.FlowId)
+                        {
+                            groupName = flow.Name + group.Number.ToString() + " " + flow.Postfix;
+                            break;
+                        }
+                    }
+                }
+            }
+            userProfile.Group = groupName;
+            foreach (var group in groups)
+            {
+                if (group.Id == user.GroupId)
+                {
+                    foreach (var flow in flows)
+                    {
+                        if (flow.Id == group.FlowId)
+                        {
+                            foreach(var faculty in faculties)
+                            {
+                                if(flow.FacultyId == faculty.Id)
+                                {
+                                    facultyName = faculty.Name;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            userProfile.Faculty = facultyName;
+            userProfile.Roles = await _userManager.GetRolesAsync(user);
 
+            return View(userProfile);
+        }
     }
 }

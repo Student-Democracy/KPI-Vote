@@ -18,5 +18,9 @@ namespace PL.Models
         public string FlowName { get; set; }    
 
         public IEnumerable<FlowModel> Flows { get; set; }
+
+        public User Author { get; set; }
+
+        public IEnumerable<GroupModel> Groups { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DAL.Entities;
+using BLL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,13 @@ namespace PL.Models
         public string FacultyNameChoose { get; set; }
 
         public List<string> Faculties { get; set; }
+
+        public User Author { get; set; }
+
+        public IEnumerable<FlowModel> Flows { get; set; }
+
+        public IEnumerable<GroupModel> Groups { get; set; }
+
+        public List<FacultyModel> FacultiesIds { get; set; }
     }
 }

@@ -124,7 +124,7 @@
                                                             <li>
                                                                 <div style="border-color: @colorBlocked" class="user">
                                                                     <div class="user-left">
-                                                                        <h3><a href="/Users/UserProfiles/@user.Id" style="color:@colorBlocked !important">@user.FirstName @user.LastName</a></h3>
+                                                                        <h3><a asp-area="" asp-controller="UsersPage" asp-action="UserProfileReader" asp-route-id ="@user.Id" style="color:@colorBlocked !important">@user.FirstName @user.LastName</a></h3>
                                                                         <p>Email : @user.Email</p>
                                                                         <p>Telegram : @user.TelegramTag</p>
                                                                         <p>Дата реєстрації : @user.RegistrationDate</p>

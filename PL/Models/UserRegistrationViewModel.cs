@@ -36,5 +36,7 @@ namespace PL.Models
         public string GroupName { get; set; }
 
         public string RoleChoose { get; set; }
+
+        public User Author { get; set; }
     }
 }

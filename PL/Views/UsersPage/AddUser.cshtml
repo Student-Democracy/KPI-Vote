@@ -69,23 +69,129 @@
                     <option disabled selected label="Оберіть"></option>
                 }
                 @{
-                    foreach (var group in Model.Groups)
+                    @if (Context.User.IsInRole("Адміністратор")
+                    || Context.User.IsInRole("Голова СР КПІ"))
                     {
-                        string groupName = "";
-                        string flowName = "";
-                        string flowPostfix = "";
-                        foreach (var flow in Model.Flows)
+                        foreach (var group in Model.Groups)
                         {
-                            if (group.FlowId == flow.Id)
+                            string groupName = "";
+                            string flowName = "";
+                            string flowPostfix = "";
+                            foreach (var flow in Model.Flows)
                             {
-                                flowName = flow.Name;
-                                flowPostfix = flow.Postfix;
+                                if (group.FlowId == flow.Id)
+                                {
+                                    flowName = flow.Name;
+                                    flowPostfix = flow.Postfix;
+                                    break;
+                                }
+                            }
+                            groupName += flowName + group.Number.ToString() + " " + flowPostfix;
+
+                            <option value="@groupName" selected="@Model.GroupName">@groupName</option>
+                        }
+                    }
+                    @if (Context.User.IsInRole("Голова СР Факультету"))
+                    {
+                        int flowIdAuthor = 0;
+                        foreach (var group in Model.Groups)
+                        {
+                            if (Model.Author.GroupId == group.Id)
+                            {
+                                flowIdAuthor = group.FlowId;
                                 break;
                             }
                         }
-                        groupName += flowName + group.Number.ToString() + " " + flowPostfix;
 
-                        <option value="@groupName" selected="@Model.GroupName">@groupName</option>
+                        int facultyIdAuthor = 0;
+                        foreach(var flow in Model.Flows)
+                        {
+                            if(flowIdAuthor == flow.Id)
+                            {
+                                facultyIdAuthor = flow.FacultyId;
+                                break;
+                            }
+                        }
+
+                        foreach (var group in Model.Groups)
+                        {
+                            string groupName = "";
+                            string flowName = "";
+                            string flowPostfix = "";
+                            foreach (var flow in Model.Flows)
+                            {
+                                if (group.FlowId == flow.Id && flow.FacultyId == facultyIdAuthor)
+                                {
+                                    flowName = flow.Name;
+                                    flowPostfix = flow.Postfix;
+                                    break;
+                                }
+                            }
+                            if (flowName != "")
+                            {
+                                groupName += flowName + group.Number.ToString() + " " + flowPostfix;
+
+                                <option value="@groupName" selected="@Model.GroupName">@groupName</option>
+                            }
+                        }
+                    }
+                    @if (Context.User.IsInRole("Староста потоку"))
+                    {
+                        int flowIdAuthor = 0;
+                        foreach (var group in Model.Groups)
+                        {
+                            if (Model.Author.GroupId == group.Id)
+                            {
+                                flowIdAuthor = group.FlowId;
+                                break;
+                            }
+                        }
+
+                        foreach (var group in Model.Groups)
+                        {
+                            string groupName = "";
+                            string flowName = "";
+                            string flowPostfix = "";
+                            foreach (var flow in Model.Flows)
+                            {
+                                if (group.FlowId == flow.Id && group.FlowId == flowIdAuthor)
+                                {
+                                    flowName = flow.Name;
+                                    flowPostfix = flow.Postfix;
+                                    break;
+                                }
+                            }
+                            if (flowName != "")
+                            {
+                                groupName += flowName + group.Number.ToString() + " " + flowPostfix;
+
+                                <option value="@groupName" selected="@Model.GroupName">@groupName</option>
+                            }
+                        }
+                    }
+                    @if (Context.User.IsInRole("Староста групи"))
+                    {
+                        foreach (var group in Model.Groups)
+                        {
+                            if (group.Id == Model.Author.GroupId)
+                            {
+                                string groupName = "";
+                                string flowName = "";
+                                string flowPostfix = "";
+                                foreach (var flow in Model.Flows)
+                                {
+                                    if (group.FlowId == flow.Id)
+                                    {
+                                        flowName = flow.Name;
+                                        flowPostfix = flow.Postfix;
+                                        break;
+                                    }
+                                }
+                                groupName += flowName + group.Number.ToString() + " " + flowPostfix;
+
+                                <option value="@groupName" selected="@Model.GroupName">@groupName</option>
+                            }
+                        }
                     }
                 }
             </select>
