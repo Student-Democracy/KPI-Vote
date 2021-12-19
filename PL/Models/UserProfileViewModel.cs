@@ -20,5 +20,7 @@ namespace PL.Models
         public IEnumerable<string> Roles;
 
         public IEnumerable<VotingReducedViewModel> Votings { get; set; }
+
+        public bool PasswordChanged { get; set; }
     }
 }

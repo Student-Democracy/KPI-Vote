@@ -67,9 +67,12 @@ function checkPassword() {
     }
 }
 
+let newPasswordWarning = '#new-pswd-warn';
+
 $(newPassword).keyup(function () {
     checkConfirmation();
     checkPassword();
+    $(newPasswordWarning).text('');
 });
 
 let form = '#change-pswd';

@@ -14,6 +14,13 @@
 {
     <p class="notification">Повідомлення: @TempData["Message"]</p>
 }
+@if (!Model.PasswordChanged)
+{
+    <p class="notification" style="color: red">Увага! Ви ще жодного разу не змінили пароль. 
+    <br />Будь ласка, змініть його, бо ваш старий пароль,
+    можливо, було скомпрометовано через те, що його було автоматично згенеровано та відправлено Вам на пошту або вашій старості.
+    <br />Враховуйте, що Ви несете відповідальність за захист ваших персональних даних</p>
+}
 <table>
     <tr>
         <td>ПІБ:</td>
@@ -62,15 +69,15 @@
 <div class="votings">
     @foreach (var voting in @Model.Votings)
     {
-            var globalColor = "#1a68a6";
-            if (voting.Status == "відмовлено")
-                globalColor = "black";
-            else if (voting.Status == "заявка")
-                globalColor = "orange";
-            else if (voting.Status == "завершено; успішне")
-                globalColor = "green";
-            else if (voting.Status == "завершено; неуспішне")
-                globalColor = "red";
+        var globalColor = "#1a68a6";
+        if (voting.Status == "відмовлено")
+            globalColor = "black";
+        else if (voting.Status == "заявка")
+            globalColor = "orange";
+        else if (voting.Status == "завершено; успішне")
+            globalColor = "green";
+        else if (voting.Status == "завершено; неуспішне")
+            globalColor = "red";
         <div style="border-color: @globalColor;" class="voting-reduced">
             <div class="voting-reduced-left">
                 <a href="/Votings/@voting.Id"><h3>@voting.Name</h3></a>

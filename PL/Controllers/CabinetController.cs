@@ -69,7 +69,8 @@ namespace PL.Controllers
                 Faculty = faculty.Name,
                 Group = groupName,
                 Roles = await _userManager.GetRolesAsync(user),
-                Votings = votings
+                Votings = votings,
+                PasswordChanged = user.PasswordChanged
             };
             return View(profile);
         }

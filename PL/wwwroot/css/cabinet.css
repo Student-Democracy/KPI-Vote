@@ -23,6 +23,7 @@ main h2 {
 
 table {
     font-size: 14pt;
+    text-align: left;
 }
 
 td:nth-child(odd) {
@@ -101,6 +102,6 @@ td:nth-child(even) {
 }
 
 .notification {
+    width: 50%;
     color: green;
-    text-align: left;
 }

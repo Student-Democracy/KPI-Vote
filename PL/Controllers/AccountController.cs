@@ -112,9 +112,20 @@ namespace PL.Controllers
                 {
                     ModelState.AddModelError("PasswordError", "Неправильний пароль");
                 }
+                else if (model.Password == model.NewPassword)
+                {
+                    ModelState.AddModelError("NewPasswordError", "Старий пароль та новий не повинні збігатися");
+                }
                 else
                 {
                     var result = await _userManager.ChangePasswordAsync(user, model.Password, model.NewPassword);
+                    user = await _userManager.GetUserAsync(User);
+                    if (!user.PasswordChanged)
+                    {
+                        user.PasswordChanged = true;
+                        await _userManager.UpdateAsync(user);
+                    }
+
                     if (result.Succeeded)
                     {
                         TempData["Message"] = "Пароль було змінено успішно";
