@@ -259,13 +259,18 @@ namespace UnitTests.BLLTests
         {
             // Arrange
             using var context = new ApplicationContext(UnitTestHelper.GetUnitTestDbOptions());
+            var userId = context.Users.FirstOrDefault(user => user.Email == "pivo@gmail.com").Id;
+            var existingBan = context.Bans.FirstOrDefault(b => b.UserId == userId);
+            existingBan.DateTo = DateTime.Now.AddMonths(1);
+            context.Bans.Update(existingBan);
+            context.SaveChanges();
             var service = new BlockService(context, _mapper);
             var blockModel = new BlockModel()
             {
                 DateFrom = DateTime.Now.AddDays(2),
                 DateTo = DateTime.Now.AddDays(35),
                 Hammer = "Test ban hammer consist of nothing",
-                UserId = context.Users.FirstOrDefault(user => user.Email == "pivo@gmail.com").Id,
+                UserId = userId,
                 AdminId = context.Users.FirstOrDefault(user => user.Email == "petrenko1@gmail.com").Id
             };
             var expectedCount = context.Bans.Count() + 1;
