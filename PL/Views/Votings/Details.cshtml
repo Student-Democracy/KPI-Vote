@@ -31,10 +31,10 @@ else
                 <p>Зареєстровано: @Model.CreationDate</p>
                 <p>Продовжиться до: @Model.CompletionDate</p>
                 <p>Рівень: @Model.Level</p>
-                <br><p>Автор: <a href="/Users/UserProfiles/@Model.AuthorId">@Model.Author</a></p>
+                <br><p>Автор: <a asp-area="" asp-controller="UsersPage" asp-action="UserProfileReader" asp-route-id ="@Model.AuthorId">@Model.Author</a></p>
                 @if (!(Model.StatusSetter is null))
                 {
-                    <p>Перевірив: <a href="/Users/UserProfiles/@Model.StatusSetterId">@Model.StatusSetter</a></p>
+                    <p>Перевірив: <a asp-area="" asp-controller="UsersPage" asp-action="UserProfileReader" asp-route-id ="@Model.StatusSetterId">@Model.StatusSetter</a></p>
                 }
                 else
                 {

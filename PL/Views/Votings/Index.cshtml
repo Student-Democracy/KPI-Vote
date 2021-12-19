@@ -71,8 +71,6 @@
                     }
                     @if (voting.IsUserAbleToChangeStatus)
                     {
-
-
                         @if (voting.Status == "заявка" || voting.Status == "відмовлено")
                         {
                             <form id="approve" method="POST" asp-controller="Votings" asp-action="Approve">
