@@ -100,6 +100,45 @@ namespace PL.Controllers
         }
 
         [HttpGet]
+        [Route("UsersPage/Unlock")]
+        public async Task<IActionResult> Unlock(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            var ban = await _blockService.GetByUserIdAsync(user.Id);
+            if (ban is null)
+                return RedirectToAction("Index", "UsersPage");
+            var unlock = new UnlockViewModel()
+            {
+                Id = user.Id,
+                Name = user.FirstName + " " + user.LastName,
+                Email = user.Email
+            };
+            var admin = await _userManager.FindByIdAsync(ban.AdminId);
+            var adminName = admin.LastName + " " + admin.FirstName;
+            if (!(admin.Patronymic is null))
+                adminName += " " + admin.Patronymic;
+            unlock.Ban = new BanReducedViewModel()
+            {
+                DateTo = ban.DateTo,
+                Hammer = ban.Hammer,
+                AdminEmail = admin.Email,
+                AdminTelegramTag = admin.TelegramTag,
+                AdminName = adminName
+            };
+            return View(unlock);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("UsersPage/UnlockConfirmed")]
+        public async Task<IActionResult> UnlockConfirmed(string id)
+        {
+                await _blockService.DeleteByUserIdAsync(id);
+                TempData["Message"] = "Користувача було розблоковано успішно";
+            return RedirectToAction("Index", "UsersPage");
+        }
+
+        [HttpGet]
         [Route("UsersPage/CreateFaculty")]
         public IActionResult CreateFaculty()
         {

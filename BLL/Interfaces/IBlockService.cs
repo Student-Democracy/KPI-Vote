@@ -13,7 +13,9 @@ namespace BLL.Interfaces
 
         Task<BlockModel> GetByUserIdAsync(string userId);
 
-        Task<IEnumerable<BlockModel>> GetSortedByAdminIdAsync(string adminId);    
+        Task<IEnumerable<BlockModel>> GetSortedByAdminIdAsync(string adminId);
+
+        Task DeleteByUserIdAsync(string userId);
 
     }
 }

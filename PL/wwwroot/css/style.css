@@ -117,3 +117,7 @@ footer {
 .warning {
     color: red;
 }
+
+.notification {
+    color: green;
+}

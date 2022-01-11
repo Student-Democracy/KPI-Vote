@@ -1,0 +1,27 @@
+﻿@using System.Globalization;
+
+
+@model UnlockViewModel
+
+@{
+    ViewData["Title"] = "Розблокування користувача";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/users-page2.css" />
+    <link rel="stylesheet" href="~/css/dialog.css" />
+}
+
+<h2>Розблокувати користувача @Model.Name, який зареєстрований під електроною поштою <a href="mailto:@Model.Email">@Model.Email</a></h2>
+<p><br />Акаунт було заблоковано до @Model.Ban.DateTo через причину "@Model.Ban.Hammer" адміністратором @Model.Ban.AdminName.</p>
+<br /><p>Ви впевнені?</p>
+<br />
+<form method="POST" asp-action="UnlockConfirmed" asp-route-id="@Model.Id">
+    <button class="btn red" type="submit">Так, розблокувати</button>
+</form>
+<div class="fake-form">
+<a class="btn" asp-action="Index">
+    Ні, повернутися до сторінки користувачів
+</a>
+    </div>
+<br />

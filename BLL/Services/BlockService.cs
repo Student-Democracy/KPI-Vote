@@ -118,6 +118,19 @@ namespace BLL.Services
             return _mapper.Map<BlockModel>(await _context.Bans.SingleOrDefaultAsync(p => p.UserId == userId && p.DateTo >= DateTime.Now));
         }
 
+        public async Task DeleteByUserIdAsync(string userId)
+        {
+            if (userId is null || userId == "")
+                throw new ArgumentNullException("Model's user id cannot be null or empty");
+            if (await _context.Users.FindAsync(userId) is null)
+                throw new ArgumentNullException("User with such an id was not found");
+            var blocks = _context.Bans.Where(p => p.UserId == userId && p.DateTo >= DateTime.Now).ToArray();
+            foreach (var block in blocks)
+            {
+                await DeleteByIdAsync(block.Id);
+            }
+        }
+
         public async Task<IEnumerable<BlockModel>> GetSortedByAdminIdAsync(string adminId)
         {
             if (adminId is null)
