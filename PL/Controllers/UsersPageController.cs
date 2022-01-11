@@ -73,8 +73,12 @@ namespace PL.Controllers
 
         [HttpGet]
         [Route("UsersPage/Block")]
+        [Authorize(Roles = "Адміністратор")]
         public async Task<IActionResult> Block(string id)
-        {            
+        {
+            var ban = await _blockService.GetByUserIdAsync(id);
+            if (!(ban is null))
+                return RedirectToAction("Index", "UsersPage");
             var block = new BlockViewModel();
             var admin = await _userManager.GetUserAsync(User);
             block.UserId = id;
@@ -87,12 +91,16 @@ namespace PL.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("UsersPage/Block")]
+        [Authorize(Roles = "Адміністратор")]
         public async Task<IActionResult> Block(BlockViewModel model, string id)
         {
+            var ban = await _blockService.GetByUserIdAsync(id);
+            if (!(ban is null))
+                return RedirectToAction("Index", "UsersPage");
+            var admin = await _userManager.GetUserAsync(User);
             var block = new BlockModel();
             block.Hammer = model.Hammer;
             block.DateTo = model.DateTo;
-            var admin = await _userManager.GetUserAsync(User);
             block.AdminId = admin.Id;
             block.UserId = id;
             await _blockService.AddAsync(block);
@@ -101,6 +109,7 @@ namespace PL.Controllers
 
         [HttpGet]
         [Route("UsersPage/Unlock")]
+        [Authorize(Roles = "Адміністратор")]
         public async Task<IActionResult> Unlock(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -131,6 +140,7 @@ namespace PL.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("UsersPage/UnlockConfirmed")]
+        [Authorize(Roles = "Адміністратор")]
         public async Task<IActionResult> UnlockConfirmed(string id)
         {
                 await _blockService.DeleteByUserIdAsync(id);
