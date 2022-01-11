@@ -1,0 +1,31 @@
+﻿@model PL.Models.ChangeTgTagViewModel
+
+@{
+    ViewData["Title"] = "Змінити тег Telegram";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/changestyle.css" />
+}
+
+@section Scripts {
+    <script src="~/js/validateTgTag.js"></script>
+}
+
+<br>
+<h2>Змінити тег Telegram</h2>
+<form method="POST" id="changeTgTagForm">
+    <label for="Tag"><b>Новий тег Telegram:</b></label><br>
+    <input type="text" placeholder="Новий тег, наприклад @@ivanov" name="Tag" required id="tgTag"><br><br>
+    <div class="warning" id="validateTgTag"><p>@Html.ValidationMessage("TgTagValError")</p></div>
+    <div class="warning"><p>@Html.ValidationMessage("TgTagIsTakenError")</p></div>
+    <label for="password"><b>Підтвердіть пароль:</b></label><br>
+    <input type="password" placeholder="Password" name="Password" required><br><br>
+    <div class="warning"><p>@Html.ValidationMessage("PasswordError")</p></div>
+    <button type="submit"> Змінити</button>
+</form>
+<br />
+<a class="btn red" asp-area="" asp-controller="Cabinet" asp-action="Index">
+    Скасувати
+</a>
+<br />

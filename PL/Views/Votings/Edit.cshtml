@@ -92,9 +92,7 @@ else
             </label>
             <br><br>
             <label for="Description">Опис (від 1000 символів):</label><br>
-            <textarea id="description" name="Description" minlength="1000" maxlength="50000" required>
-            @Model.Description
-        </textarea>
+            <textarea id="description" name="Description" minlength="1000" maxlength="50000" required>@Model.Description</textarea>
             <p>Зараз символів: <span id="desc-characters" style="color: red;">0</span></p>
             <br>
             <div class="warning"><p>@Html.ValidationMessage("VotingEditError")</p></div>
