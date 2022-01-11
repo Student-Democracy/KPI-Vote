@@ -17,7 +17,7 @@ $(tag).keyup(function () {
     checkTgTag(this);
 });
 
-let form = '#changeTgTagForm';
+var form = '#form';
 $(form).submit(function (event) {
     if (!checkTgTag(tag))
         event.preventDefault();

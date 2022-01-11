@@ -14,13 +14,13 @@
 @section Scripts {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script type="text/javascript" src="~/js/show-list-script.js"></script>
+    <script src="~/js/validateTgTag.js"></script>
 }
-
 
 <h2>Додати нового студента до онлайн-платформи голосування в КПІ</h2>
 <br>
 <div style="border-color: orange;" class="blocking">
-    <form id="block-user" class="block-user" method="POST">
+    <form id="form" class="block-user" method="POST">
         <br />
         <label for="LastName">
             Прізвище:
@@ -47,6 +47,7 @@
             Email:
             <input type="text" name="Email" value="" required>
         </label>
+        <div class="warning"><p>@Html.ValidationMessage("EmailIsTakenError")</p></div>
         <br />
         <br />
         <br />
@@ -54,8 +55,10 @@
         <br />
         <label for="TelegramTag">
             Telegram:
-            <input type="text" name="TelegramTag" value="" required>
+            <input type="text" name="TelegramTag" value="" required id="tgTag">
         </label>
+        <div class="warning" id="validateTgTag"><p>@Html.ValidationMessage("TgTagValError")</p></div>
+        <div class="warning"><p>@Html.ValidationMessage("TgTagIsTakenError")</p></div>
         <br /><br /><br />
 
         <label>Добавте користувача, вибравши групу, в яку його було зараховано. Наприклад, ІС-02 мп.</label><br>
@@ -70,7 +73,7 @@
                 }
                 @{
                     @if (Context.User.IsInRole("Адміністратор")
-                    || Context.User.IsInRole("Голова СР КПІ"))
+                || Context.User.IsInRole("Голова СР КПІ"))
                     {
                         foreach (var group in Model.Groups)
                         {
@@ -104,9 +107,9 @@
                         }
 
                         int facultyIdAuthor = 0;
-                        foreach(var flow in Model.Flows)
+                        foreach (var flow in Model.Flows)
                         {
-                            if(flowIdAuthor == flow.Id)
+                            if (flowIdAuthor == flow.Id)
                             {
                                 facultyIdAuthor = flow.FacultyId;
                                 break;
@@ -211,28 +214,28 @@
                 }
                 @{
                     @if (Context.User.IsInRole("Адміністратор")
-                   || Context.User.IsInRole("Голова СР КПІ")
-                   || Context.User.IsInRole("Голова СР Факультету")
-                   || Context.User.IsInRole("Староста потоку")
-                   || Context.User.IsInRole("Староста групи"))
+               || Context.User.IsInRole("Голова СР КПІ")
+               || Context.User.IsInRole("Голова СР Факультету")
+               || Context.User.IsInRole("Староста потоку")
+               || Context.User.IsInRole("Староста групи"))
                     {
                         <option value="Студент" selected="@Model.RoleChoose">Студент</option>
                     }
                     @if (Context.User.IsInRole("Адміністратор")
-                   || Context.User.IsInRole("Голова СР КПІ")
-                   || Context.User.IsInRole("Голова СР Факультету")
-                   || Context.User.IsInRole("Староста потоку"))
+               || Context.User.IsInRole("Голова СР КПІ")
+               || Context.User.IsInRole("Голова СР Факультету")
+               || Context.User.IsInRole("Староста потоку"))
                     {
                         <option value="Староста групи" selected="@Model.RoleChoose">Староста групи</option>
                     }
                     @if (Context.User.IsInRole("Адміністратор")
-                      || Context.User.IsInRole("Голова СР КПІ")
-                      || Context.User.IsInRole("Голова СР Факультету"))
+                  || Context.User.IsInRole("Голова СР КПІ")
+                  || Context.User.IsInRole("Голова СР Факультету"))
                     {
                         <option value="Староста потоку" selected="@Model.RoleChoose">Староста потоку</option>
                     }
                     @if (Context.User.IsInRole("Адміністратор")
-                      || Context.User.IsInRole("Голова СР КПІ"))
+                  || Context.User.IsInRole("Голова СР КПІ"))
                     {
                         <option value="Голова СР Факультету" selected="@Model.RoleChoose">Голова СР Факультету</option>
                     }

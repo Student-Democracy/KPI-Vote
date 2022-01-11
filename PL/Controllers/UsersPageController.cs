@@ -101,8 +101,8 @@ namespace PL.Controllers
 
         [HttpGet]
         [Route("UsersPage/CreateFaculty")]
-        public async Task<IActionResult> CreateFaculty()
-        {           
+        public IActionResult CreateFaculty()
+        {
             return View();
         }
 
@@ -256,7 +256,6 @@ namespace PL.Controllers
             user.RegistrationDate = DateTime.Now;
             user.Email = model.Email;
             user.TelegramTag = model.TelegramTag;
-            user.PasswordHash = "sample1";
             user.PasswordChanged = false;
 
             string[] full_name_group = model.GroupName.Split(' ');
@@ -294,15 +293,31 @@ namespace PL.Controllers
             user.GroupId = groupId;
 
             User newUser = await _userManager.FindByEmailAsync(user.Email);
-            if (newUser is null)
+            var author = await _userManager.GetUserAsync(User);
+            model.Author = author;
+            model.Groups = groups;
+            model.Flows = flows;
+            if (_userManager.Users.AsEnumerable().Where(u => u.Id != user.Id).Select(u => u.TelegramTag.ToUpperInvariant()).Contains(model.TelegramTag.ToUpperInvariant()))
+            {
+                ModelState.AddModelError("TgTagIsTakenError", "Такий тег телеграм вже зайнято");
+                return View(model);
+            }
+                if (newUser is null)
             {
                 user.UserName = user.Email;
                 user.PasswordHash = null;
-                await _userManager.CreateAsync(user, "P@$$w0rd");
-                newUser = await _userManager.FindByEmailAsync(user.Email);
-                await _userManager.AddToRoleAsync(newUser, model.RoleChoose);
+                var result = await _userManager.CreateAsync(user, "P@$$w0rd");
+                    newUser = await _userManager.FindByEmailAsync(user.Email);
+                    if (model.RoleChoose != "Студент")
+                        await _userManager.AddToRoleAsync(newUser, "Студент");
+                    await _userManager.AddToRoleAsync(newUser, model.RoleChoose);
+                return RedirectToAction("Index", "UsersPage");
             }
-            return RedirectToAction("Index", "UsersPage");
+            else
+            {
+                ModelState.AddModelError("EmailIsTakenError", "Така електронна пошта вже зайнята");
+                return View(model);
+            }
         }
 
         [HttpGet]
