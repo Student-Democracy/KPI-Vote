@@ -11,10 +11,10 @@
 <br>
 <h2>Змінити електронну пошту</h2>
 <form method="POST">
-    <label for="email"><b>Нова електронна пошта:</b></label><br>
+    <label for="NewEmail"><b>Нова електронна пошта:</b></label><br>
     <input type="text" placeholder="E-mail" name="NewEmail" required><br><br>
     <div class="warning"><p>@Html.ValidationMessage("EmailIsTakenError")</p></div>
-    <label for="password"><b>Підтвердіть пароль:</b></label><br>
+    <label for="Password"><b>Підтвердіть пароль:</b></label><br>
     <input type="password" placeholder="Password" name="Password" required><br><br>
     <div class="warning"><p>@Html.ValidationMessage("PasswordError")</p></div>
     <button type="submit"> Змінити</button>

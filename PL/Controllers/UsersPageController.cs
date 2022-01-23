@@ -73,8 +73,12 @@ namespace PL.Controllers
 
         [HttpGet]
         [Route("UsersPage/Block")]
+        [Authorize(Roles = "Адміністратор")]
         public async Task<IActionResult> Block(string id)
-        {            
+        {
+            var ban = await _blockService.GetByUserIdAsync(id);
+            if (!(ban is null))
+                return RedirectToAction("Index", "UsersPage");
             var block = new BlockViewModel();
             var admin = await _userManager.GetUserAsync(User);
             block.UserId = id;
@@ -87,12 +91,16 @@ namespace PL.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("UsersPage/Block")]
+        [Authorize(Roles = "Адміністратор")]
         public async Task<IActionResult> Block(BlockViewModel model, string id)
         {
+            var ban = await _blockService.GetByUserIdAsync(id);
+            if (!(ban is null))
+                return RedirectToAction("Index", "UsersPage");
+            var admin = await _userManager.GetUserAsync(User);
             var block = new BlockModel();
             block.Hammer = model.Hammer;
             block.DateTo = model.DateTo;
-            var admin = await _userManager.GetUserAsync(User);
             block.AdminId = admin.Id;
             block.UserId = id;
             await _blockService.AddAsync(block);
@@ -100,9 +108,50 @@ namespace PL.Controllers
         }
 
         [HttpGet]
+        [Route("UsersPage/Unlock")]
+        [Authorize(Roles = "Адміністратор")]
+        public async Task<IActionResult> Unlock(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            var ban = await _blockService.GetByUserIdAsync(user.Id);
+            if (ban is null)
+                return RedirectToAction("Index", "UsersPage");
+            var unlock = new UnlockViewModel()
+            {
+                Id = user.Id,
+                Name = user.FirstName + " " + user.LastName,
+                Email = user.Email
+            };
+            var admin = await _userManager.FindByIdAsync(ban.AdminId);
+            var adminName = admin.LastName + " " + admin.FirstName;
+            if (!(admin.Patronymic is null))
+                adminName += " " + admin.Patronymic;
+            unlock.Ban = new BanReducedViewModel()
+            {
+                DateTo = ban.DateTo,
+                Hammer = ban.Hammer,
+                AdminEmail = admin.Email,
+                AdminTelegramTag = admin.TelegramTag,
+                AdminName = adminName
+            };
+            return View(unlock);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("UsersPage/UnlockConfirmed")]
+        [Authorize(Roles = "Адміністратор")]
+        public async Task<IActionResult> UnlockConfirmed(string id)
+        {
+                await _blockService.DeleteByUserIdAsync(id);
+                TempData["Message"] = "Користувача було розблоковано успішно";
+            return RedirectToAction("Index", "UsersPage");
+        }
+
+        [HttpGet]
         [Route("UsersPage/CreateFaculty")]
-        public async Task<IActionResult> CreateFaculty()
-        {           
+        public IActionResult CreateFaculty()
+        {
             return View();
         }
 
@@ -256,7 +305,6 @@ namespace PL.Controllers
             user.RegistrationDate = DateTime.Now;
             user.Email = model.Email;
             user.TelegramTag = model.TelegramTag;
-            user.PasswordHash = "sample1";
             user.PasswordChanged = false;
 
             string[] full_name_group = model.GroupName.Split(' ');
@@ -294,15 +342,31 @@ namespace PL.Controllers
             user.GroupId = groupId;
 
             User newUser = await _userManager.FindByEmailAsync(user.Email);
-            if (newUser is null)
+            var author = await _userManager.GetUserAsync(User);
+            model.Author = author;
+            model.Groups = groups;
+            model.Flows = flows;
+            if (_userManager.Users.AsEnumerable().Where(u => u.Id != user.Id).Select(u => u.TelegramTag.ToUpperInvariant()).Contains(model.TelegramTag.ToUpperInvariant()))
+            {
+                ModelState.AddModelError("TgTagIsTakenError", "Такий тег телеграм вже зайнято");
+                return View(model);
+            }
+                if (newUser is null)
             {
                 user.UserName = user.Email;
                 user.PasswordHash = null;
-                await _userManager.CreateAsync(user, "P@$$w0rd");
-                newUser = await _userManager.FindByEmailAsync(user.Email);
-                await _userManager.AddToRoleAsync(newUser, model.RoleChoose);
+                var result = await _userManager.CreateAsync(user, "P@$$w0rd");
+                    newUser = await _userManager.FindByEmailAsync(user.Email);
+                    if (model.RoleChoose != "Студент")
+                        await _userManager.AddToRoleAsync(newUser, "Студент");
+                    await _userManager.AddToRoleAsync(newUser, model.RoleChoose);
+                return RedirectToAction("Index", "UsersPage");
             }
-            return RedirectToAction("Index", "UsersPage");
+            else
+            {
+                ModelState.AddModelError("EmailIsTakenError", "Така електронна пошта вже зайнята");
+                return View(model);
+            }
         }
 
         [HttpGet]

@@ -113,3 +113,11 @@ footer {
         margin-right: 30px;
     }
 }
+
+.warning {
+    color: red;
+}
+
+.notification {
+    color: green;
+}

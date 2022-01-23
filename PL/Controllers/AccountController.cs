@@ -72,7 +72,7 @@ namespace PL.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login", "Account");
         }
-
+        
         [Authorize]
         [HttpGet]
         public IActionResult ChangeEmail()
@@ -96,6 +96,46 @@ namespace PL.Controllers
                     return RedirectToAction("Index", "Cabinet");
                 else
                     ModelState.AddModelError("EmailIsTakenError", "Така електронна пошта вже зайнята");
+            }
+            else
+            {
+                ModelState.AddModelError("PasswordError", "Неправильний пароль");
+            }
+            return View();
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ChangeTgTag()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangeTgTag(ChangeTgTagViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                if (model.Tag.StartsWith('@'))
+                {
+                    if (!_userManager.Users.AsEnumerable().Where(u => u.Id != user.Id).Select(u => u.TelegramTag.ToUpperInvariant()).Contains(model.Tag.ToUpperInvariant()))
+                    {
+                        user.TelegramTag = model.Tag;
+                        var result = await _userManager.UpdateAsync(user);
+                        if (result.Succeeded)
+                            return RedirectToAction("Index", "Cabinet");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("TgTagIsTakenError", "Такий тег телеграм вже зайнято");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("TgTagValError", "Tg tag should start with @");
+                }
             }
             else
             {

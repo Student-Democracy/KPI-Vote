@@ -35,7 +35,7 @@ namespace PL
             services.AddControllersWithViews();
 
             services.AddDbContext<ApplicationContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Transient);
 
             services.AddIdentity<User, IdentityRole>(options =>
             {
